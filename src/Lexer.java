@@ -78,7 +78,22 @@ public class Lexer {
                         advance();
                     }
                     return null;
-                } else {
+                } else if (match('*')) {
+                    while (peek() != '*' && peek() != '/' && !isAtEnd()) {
+                        if (peek() == '\n') {
+                            line++;
+                            column = 1;
+                        }
+                        advance();
+                    }
+                    if (isAtEnd()) {
+                        throw new RuntimeException("Unterminated comment");
+                    }
+                    advance();
+                    advance();
+                    return null;
+                } 
+                else {
                     return new Token(TokenType.SLASH, fileName, String.valueOf(line), String.valueOf(column));
                 }
             }
@@ -93,13 +108,23 @@ public class Lexer {
             default -> {
                 return new Token(TokenType.EOF, fileName, String.valueOf(line), String.valueOf(column));
             }
+        }
     }
 
     private boolean isAtEnd() {
-        return false;
+        return this.column >= this.source.length();
     }
 
     private char advance() {
-        return ' ';
+        this.column++;
+        return this.current = this.source.charAt(this.column);
+    }
+
+    private boolean match(char expected) {
+        return this.current == expected;
+    }
+
+    private char peek() {
+        return this.current;
     }
 }

@@ -8,7 +8,7 @@ public class App {
         String contents = FileReader.readFileAndReturnContents(path);
 
         try {
-            Lexer lexer = new Lexer(contents);
+            Lexer lexer = new Lexer(contents, path);
             List<Token> tokens = lexer.scanTokens();
             for (Token token : tokens) {
                 System.out.println(token.type + " " + token);
