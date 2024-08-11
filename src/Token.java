@@ -3,12 +3,14 @@ public class Token {
     public String fileName;
     public String Line;
     public String Column;
+    public String Value;
 
-    public Token(TokenType type, String fileName, String Line, String Column) {
+    public Token(TokenType type, String fileName, String Line, String Column, String Value) {
         this.type = type;
         this.fileName = fileName;
         this.Line = Line;
         this.Column = Column;
+        this.Value = Value;
     }
 
     @Override
@@ -18,6 +20,7 @@ public class Token {
                 ", fileName='" + fileName + '\'' +
                 ", Line='" + Line + '\'' +
                 ", Column='" + Column + '\'' +
+                ", Value='" + Value + '\'' +
                 '}';
     }
 }

@@ -3,6 +3,7 @@ import java.util.List;
 public class App {
     public static void main(String[] args) throws Exception {
         // receive file path from command line arguments
+        // example: java App src/test.txt
         String path = args[0];
         // read file contents
         String contents = FileReader.readFileAndReturnContents(path);

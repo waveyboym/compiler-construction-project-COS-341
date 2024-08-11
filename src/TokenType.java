@@ -1,20 +1,29 @@
 public enum TokenType {
     // Single-character tokens.
     LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE,
-    COMMA, DOT, MINUS, PLUS, SEMICOLON, SLASH, STAR,
+    COMMA, SEMICOLON,
 
-    // One or two character tokens.
-    BANG, BANG_EQUAL,
-    EQUAL, EQUAL_EQUAL,
-    GREATER, GREATER_EQUAL,
-    LESS, LESS_EQUAL,
+    // Unary operators.
+    NOT, SQRT,
 
+    // Binary operators.
+    OR, AND, EQ, GT, ADD, SUB, MUL, DIV,
+
+    // Variable Types and Function Return Types
+    NUM, VTEXT, FVOID,
+
+    // Variables.
+    VNAME, FNAME,
+    
     // Literals.
-    IDENTIFIER, STRING, NUMBER,
+    NUMLIT, TEXTLIT,
 
     // Keywords.
-    AND, CLASS, ELSE, FALSE, FUN, FOR, IF, NIL, OR,
-    PRINT, RETURN, SUPER, THIS, TRUE, VAR, WHILE,
+    BEGIN, END, IF, THEN, ELSE, SKIP, HALT, PRINT, 
+    INPUT, MAIN, 
+
+    // Null, this token will be discarded in the lexing phase
+    NULLTYPE,
 
     EOF
 }
