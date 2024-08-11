@@ -53,14 +53,10 @@ public class Lexer {
                 return new Token(TokenType.SEMICOLON, fileName, String.valueOf(line), String.valueOf(column), String.valueOf(c));
             }
             case 'n' -> {
-                if (peekAndMatch('o', 1) && peekAndMatch('t', 2)) {
-                    advance();
-                    advance();
+                if (advanceAndMatch('o') && advanceAndMatch('t')) {
                     return new Token(TokenType.NOT, fileName, String.valueOf(line), String.valueOf(column), "not");
                 }
-                else if (peekAndMatch('u', 1) && peekAndMatch('m', 2)) {
-                    advance();
-                    advance();
+                else if (goBack(2) && advanceAndMatch('u') && advanceAndMatch('m')) {
                     return new Token(TokenType.NUM, fileName, String.valueOf(line), String.valueOf(column), "num");
                 }
                 else {
@@ -68,21 +64,13 @@ public class Lexer {
                 }
             }
             case 's' -> {
-                if (peekAndMatch('q', 1) && peekAndMatch('r', 2) && peekAndMatch('t', 3)) {
-                    advance();
-                    advance();
-                    advance();
+                if (advanceAndMatch('q') && advanceAndMatch('r') && advanceAndMatch('t')) {
                     return new Token(TokenType.SQRT, fileName, String.valueOf(line), String.valueOf(column), "sqrt");
                 }
-                else if (peekAndMatch('k', 1) && peekAndMatch('i', 2) && peekAndMatch('p', 3)) {
-                    advance();
-                    advance();
-                    advance();
+                else if (goBack(3) && advanceAndMatch('k') && advanceAndMatch('i') && advanceAndMatch('p')) {
                     return new Token(TokenType.SKIP, fileName, String.valueOf(line), String.valueOf(column), "skip");
                 }
-                else if (peekAndMatch('u', 1) && peekAndMatch('b', 2)) {
-                    advance();
-                    advance();
+                else if (goBack(3) && advanceAndMatch('u') && advanceAndMatch('b')) {
                     return new Token(TokenType.SUB, fileName, String.valueOf(line), String.valueOf(column), "sub");
                 }
                 else {
@@ -90,8 +78,7 @@ public class Lexer {
                 }
             }
             case 'o' -> {
-                if (peekAndMatch('r', 1)) {
-                    advance();
+                if (advanceAndMatch('r')) {
                     return new Token(TokenType.OR, fileName, String.valueOf(line), String.valueOf(column), "or");
                 }
                 else {
@@ -99,14 +86,10 @@ public class Lexer {
                 }
             }
             case 'a' -> {
-                if (peekAndMatch('n', 1) && peekAndMatch('d', 2)) {
-                    advance();
-                    advance();
+                if (advanceAndMatch('n') && advanceAndMatch('d')) {
                     return new Token(TokenType.AND, fileName, String.valueOf(line), String.valueOf(column), "and");
                 }
-                else if (peekAndMatch('d', 1) && peekAndMatch('d', 2)) {
-                    advance();
-                    advance();
+                else if (goBack(2) && advanceAndMatch('d') && advanceAndMatch('d')) {
                     return new Token(TokenType.ADD, fileName, String.valueOf(line), String.valueOf(column), "add");
                 }
                 else {
@@ -114,19 +97,13 @@ public class Lexer {
                 }
             }
             case 'e' -> {
-                if (peekAndMatch('q', 1)) {
-                    advance();
+                if (advanceAndMatch('q')) {
                     return new Token(TokenType.EQ, fileName, String.valueOf(line), String.valueOf(column), "eq");
                 }
-                else if (peekAndMatch('l', 1) && peekAndMatch('s', 2) && peekAndMatch('e', 3)) {
-                    advance();
-                    advance();
-                    advance();
+                else if (goBack(1) && advanceAndMatch('l') && advanceAndMatch('s') && advanceAndMatch('e')) {
                     return new Token(TokenType.ELSE, fileName, String.valueOf(line), String.valueOf(column), "else");
                 }
-                if (peekAndMatch('n', 1) && peekAndMatch('d', 2)) {
-                    advance();
-                    advance();
+                if (goBack(3) && advanceAndMatch('n') && advanceAndMatch('d')) {
                     return new Token(TokenType.END, fileName, String.valueOf(line), String.valueOf(column), "end");
                 }
                 else {
@@ -134,8 +111,7 @@ public class Lexer {
                 }
             }
             case 'g' -> {
-                if (peekAndMatch('t', 1)) {
-                    advance();
+                if (advanceAndMatch('t')) {
                     return new Token(TokenType.GT, fileName, String.valueOf(line), String.valueOf(column), "gt");
                 }
                 else {
@@ -143,15 +119,10 @@ public class Lexer {
                 }
             }
             case 'm' -> {
-                if (peekAndMatch('u', 1) && peekAndMatch('l', 2)) {
-                    advance();
-                    advance();
+                if (advanceAndMatch('u') && advanceAndMatch('l')) {
                     return new Token(TokenType.MUL, fileName, String.valueOf(line), String.valueOf(column), "mul");
                 }
-                if (peekAndMatch('a', 1) && peekAndMatch('i', 2) && peekAndMatch('n', 3)) {
-                    advance();
-                    advance();
-                    advance();
+                if (goBack(2) && advanceAndMatch('a') && advanceAndMatch('i') && advanceAndMatch('n')) {
                     return new Token(TokenType.MAIN, fileName, String.valueOf(line), String.valueOf(column), "main");
                 }
                 else {
@@ -159,9 +130,7 @@ public class Lexer {
                 }
             }
             case 'd' -> {
-                if (peekAndMatch('i', 1) && peekAndMatch('v', 2)) {
-                    advance();
-                    advance();
+                if (advanceAndMatch('i') && advanceAndMatch('v')){
                     return new Token(TokenType.DIV, fileName, String.valueOf(line), String.valueOf(column), "div");
                 }
                 else {
@@ -169,16 +138,10 @@ public class Lexer {
                 }
             }
             case 't' -> {
-                if (peekAndMatch('h', 1) && peekAndMatch('e', 2) && peekAndMatch('n', 3)) {
-                    advance();
-                    advance();
-                    advance();
+                if (advanceAndMatch('h') && advanceAndMatch('e') && advanceAndMatch('n')){
                     return new Token(TokenType.THEN, fileName, String.valueOf(line), String.valueOf(column), "then");
                 }
-                else if (peekAndMatch('e', 1) && peekAndMatch('x', 2) && peekAndMatch('t', 3)) {
-                    advance();
-                    advance();
-                    advance();
+                else if (goBack(3) && advanceAndMatch('e') && advanceAndMatch('x') && advanceAndMatch('t')){
                     return new Token(TokenType.VTEXT, fileName, String.valueOf(line), String.valueOf(column), "text");
                 }
                 else {
@@ -186,10 +149,7 @@ public class Lexer {
                 }
             }
             case 'v' -> {
-                if (peekAndMatch('o', 1) && peekAndMatch('i', 2) && peekAndMatch('d', 3)) {
-                    advance();
-                    advance();
-                    advance();
+                if (advanceAndMatch('o') && advanceAndMatch('i') && advanceAndMatch('d')) {
                     return new Token(TokenType.FVOID, fileName, String.valueOf(line), String.valueOf(column), "void");
                 }
                 else {
@@ -197,11 +157,7 @@ public class Lexer {
                 }
             }
             case 'b' -> {
-                if (peekAndMatch('e', 1) && peekAndMatch('g', 2) && peekAndMatch('i', 3)
-                && peekAndMatch('n', 4)){
-                    advance();
-                    advance();
-                    advance();
+                if (advanceAndMatch('e') && advanceAndMatch('g') && advanceAndMatch('i') && advanceAndMatch('n')){
                     return new Token(TokenType.BEGIN, fileName, String.valueOf(line), String.valueOf(column), "begin");
                 }
                 else {
@@ -209,8 +165,7 @@ public class Lexer {
                 }
             }
             case 'i' -> {
-                if (peekAndMatch('f', 1)) {
-                    advance();
+                if (advanceAndMatch('f')) {
                     return new Token(TokenType.IF, fileName, String.valueOf(line), String.valueOf(column), "if");
                 }
                 else {
@@ -218,10 +173,7 @@ public class Lexer {
                 }
             }
             case 'h' -> {
-                if (peekAndMatch('a', 1) && peekAndMatch('l', 2) && peekAndMatch('t', 3)) {
-                    advance();
-                    advance();
-                    advance();
+                if (advanceAndMatch('a') && advanceAndMatch('l') && advanceAndMatch('t')) {
                     return new Token(TokenType.HALT, fileName, String.valueOf(line), String.valueOf(column), "halt");
                 }
                 else {
@@ -229,12 +181,7 @@ public class Lexer {
                 }
             }
             case 'p' -> {
-                if (peekAndMatch('r', 1) && peekAndMatch('i', 2) && peekAndMatch('n', 3)
-                && peekAndMatch('t', 4)) {
-                    advance();
-                    advance();
-                    advance();
-                    advance();
+                if (advanceAndMatch('r') && advanceAndMatch('i') && advanceAndMatch('n') && advanceAndMatch('t')) {
                     return new Token(TokenType.PRINT, fileName, String.valueOf(line), String.valueOf(column), "print");
                 }
                 else {
@@ -244,8 +191,7 @@ public class Lexer {
             case 'V' -> {
                 String value = "V";
                 // match regex V_[a‒z]([a‒z]|[0‒9])*
-                if (peekAndMatch('_', 1)) {
-                    advance();
+                if (advanceAndMatch('_')) {
                     value += this.current;
                     advance();
                     if (Character.isLetter(this.source.charAt(this.column))) {
@@ -255,7 +201,7 @@ public class Lexer {
                             value += this.current;
                             advance();
                         }
-                        return new Token(TokenType.VNAME, fileName, String.valueOf(line), String.valueOf(column), value);
+                        return new Token(TokenType.VNAME, fileName, String.valueOf(line), String.valueOf((char) column), value);
                     }
                 } 
                 return null;
@@ -263,8 +209,7 @@ public class Lexer {
             case 'F' -> {
                 String value = "F";
                 // match regex F_[a‒z]([a‒z]|[0‒9])*
-                if (peekAndMatch('_', 1)) {
-                    advance();
+                if (advanceAndMatch('_')) {
                     value += this.current;
                     advance();
                     if (Character.isLetter(this.source.charAt(this.column))) {
@@ -303,37 +248,54 @@ public class Lexer {
                 }
                 return null;
             }
-            // match regex [0‒9]
-            /*  
-            case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' -> {
-                // match regex 0 |0.([0‒9])* [1‒9] |-0.([0‒9])* [1‒9] | [1‒9]([0‒9])* |-[1‒9]([0‒9])* | [1‒9]([0‒9])*. ([0‒9])* [1‒9] |-[1‒9]([0‒9])*. ([0‒9])* [1‒9]
-
-                if (c == '0') {
-                    if (peekAndMatch('.', 1)) {
-                        advance();
-                        advance();
-                        while (Character.isDigit(this.source.charAt(this.column))) {
-                            advance();
-                        }
-                        return new Token(TokenType.NUMLIT, fileName, String.valueOf(line), String.valueOf(column));
+            case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-' -> {
+                // match regex ^(0|-?0\.[0-9]*[1-9]|-?[1-9][0-9]*|-?[1-9][0-9]*\.[0-9]*[1-9])$
+                goBack(1);
+                if (advanceAndMatch('0') || (advanceAndMatch('-') && advanceAndMatch('0'))) {
+                    if (this.source.charAt(this.column) != '.') {
+                        return new Token(TokenType.NUMLIT, fileName, String.valueOf(line), String.valueOf(column), "0");
                     }
-                    return new Token(TokenType.NUMLIT, fileName, String.valueOf(line), String.valueOf(column));
+                    String value = "";
+                    value += this.current;
+                    while (Character.isDigit(this.source.charAt(this.column))) {
+                        value += this.current;
+                        advance();
+                    }
+
+                    // if last character in value is not equal to 1-9 return null
+                    if (value.charAt(value.length() - 1) == '0') {
+                        return null;
+                    }
+
+                    return new Token(TokenType.NUMLIT, fileName, String.valueOf(line), String.valueOf(column), value);  
+                }
+                else if(goBack(2) && advanceAndMatch('-') && Character.isDigit(this.source.charAt(this.column))
+                && this.source.charAt(this.column) != '0') {
+                    String value = "-";
+                    value += this.current;
+                    advance();
+                    while (Character.isDigit(this.source.charAt(this.column))) {
+                        value += this.current;
+                        advance();
+                    }
+                    if (this.source.charAt(this.column) != '.') {
+                        return new Token(TokenType.NUMLIT, fileName, String.valueOf(line), String.valueOf(column), value);
+                    }
+                    value += this.current;
+                    advance();
+                    while (Character.isDigit(this.source.charAt(this.column))) {
+                        value += this.current;
+                        advance();
+                    }
+                    if (value.charAt(value.length() - 1) == '0') {
+                        return null;
+                    }
+                    return new Token(TokenType.NUMLIT, fileName, String.valueOf(line), String.valueOf(column), value);
                 }
                 else {
-                    while (Character.isDigit(this.source.charAt(this.column))) {
-                        advance();
-                    }
-                    if (peekAndMatch('.', 1)) {
-                        advance();
-                        advance();
-                        while (Character.isDigit(this.source.charAt(this.column))) {
-                            advance();
-                        }
-                        return new Token(TokenType.NUMLIT, fileName, String.valueOf(line), String.valueOf(column));
-                    }
-                    return new Token(TokenType.NUMLIT, fileName, String.valueOf(line), String.valueOf(column));
+                    return null;
                 }
-            }*/
+            }
             case ' ', '\r', '\t' -> {
                 return new Token(TokenType.NULLTYPE, fileName, String.valueOf(line), String.valueOf(column), String.valueOf(c));
             }
@@ -357,10 +319,16 @@ public class Lexer {
         return this.current = this.source.charAt(this.column);
     }
 
-    private boolean peekAndMatch(char expected, int offset) {
-        if (this.column + offset >= this.source.length()) {
+    private boolean advanceAndMatch(char expected) {
+        this.column++;
+        if (this.column >= this.source.length()) {
             return false;
         }
-        return this.source.charAt(this.column + offset) == expected;
+        return this.source.charAt(this.column) == expected;
+    }
+
+    private boolean goBack(int steps) {
+        this.column -= steps;
+        return true;
     }
 }
