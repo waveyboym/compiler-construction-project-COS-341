@@ -1,0 +1,4 @@
+main
+num
+text
+skip halt not

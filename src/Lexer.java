@@ -5,14 +5,15 @@ public class Lexer {
     private final String source;
     private final String fileName;
     private char current;
-    private int line, column;
+    private int line, column, seekValue, lineColumn;
 
     public Lexer(String source, String fileName) {
         this.fileName = fileName;
         this.source = source;
         this.current = source.charAt(0);
         this.line = 1;
-        this.column = 1;
+        this.column = 0;
+        this.seekValue = 0;
     }
 
     public List<Token> scanTokens() {
@@ -21,11 +22,12 @@ public class Lexer {
             Token token = processCurrentChar();
             if (token == null){
                 System.out.println("Error: Invalid token at line " + line + " column " + column);
-                return null;
+                return new ArrayList<>();
             }
             if (token.type != TokenType.NULLTYPE) {
                 tokens.add(token);
             }
+            this.seekValue = 0;
             advance();
         }
         return tokens;
@@ -35,29 +37,29 @@ public class Lexer {
         char c = this.current;
         switch (c) {
             case '(' -> {
-                return new Token(TokenType.LEFT_PAREN, fileName, String.valueOf(line), String.valueOf(column), String.valueOf(c));
+                return new Token(TokenType.LEFT_PAREN, fileName, String.valueOf(line), String.valueOf(lineColumn), String.valueOf(c));
             }
             case ')' -> {
-                return new Token(TokenType.RIGHT_PAREN, fileName, String.valueOf(line), String.valueOf(column), String.valueOf(c));
+                return new Token(TokenType.RIGHT_PAREN, fileName, String.valueOf(line), String.valueOf(lineColumn), String.valueOf(c));
             }
             case '{' -> {
-                return new Token(TokenType.LEFT_BRACE, fileName, String.valueOf(line), String.valueOf(column), String.valueOf(c));
+                return new Token(TokenType.LEFT_BRACE, fileName, String.valueOf(line), String.valueOf(lineColumn), String.valueOf(c));
             }
             case '}' -> {
-                return new Token(TokenType.RIGHT_BRACE, fileName, String.valueOf(line), String.valueOf(column), String.valueOf(c));
+                return new Token(TokenType.RIGHT_BRACE, fileName, String.valueOf(line), String.valueOf(lineColumn), String.valueOf(c));
             }
             case ',' -> {
-                return new Token(TokenType.COMMA, fileName, String.valueOf(line), String.valueOf(column), String.valueOf(c));
+                return new Token(TokenType.COMMA, fileName, String.valueOf(line), String.valueOf(lineColumn), String.valueOf(c));
             }
             case ';' -> {
-                return new Token(TokenType.SEMICOLON, fileName, String.valueOf(line), String.valueOf(column), String.valueOf(c));
+                return new Token(TokenType.SEMICOLON, fileName, String.valueOf(line), String.valueOf(lineColumn), String.valueOf(c));
             }
             case 'n' -> {
                 if (advanceAndMatch('o') && advanceAndMatch('t')) {
-                    return new Token(TokenType.NOT, fileName, String.valueOf(line), String.valueOf(column), "not");
+                    return new Token(TokenType.NOT, fileName, String.valueOf(line), String.valueOf(lineColumn), "not");
                 }
-                else if (goBack(2) && advanceAndMatch('u') && advanceAndMatch('m')) {
-                    return new Token(TokenType.NUM, fileName, String.valueOf(line), String.valueOf(column), "num");
+                else if (goBack(this.seekValue) && advanceAndMatch('u') && advanceAndMatch('m')) {
+                    return new Token(TokenType.NUM, fileName, String.valueOf(line), String.valueOf(lineColumn), "num");
                 }
                 else {
                     return null;
@@ -65,13 +67,13 @@ public class Lexer {
             }
             case 's' -> {
                 if (advanceAndMatch('q') && advanceAndMatch('r') && advanceAndMatch('t')) {
-                    return new Token(TokenType.SQRT, fileName, String.valueOf(line), String.valueOf(column), "sqrt");
+                    return new Token(TokenType.SQRT, fileName, String.valueOf(line), String.valueOf(lineColumn), "sqrt");
                 }
-                else if (goBack(3) && advanceAndMatch('k') && advanceAndMatch('i') && advanceAndMatch('p')) {
-                    return new Token(TokenType.SKIP, fileName, String.valueOf(line), String.valueOf(column), "skip");
+                else if (goBack(this.seekValue) && advanceAndMatch('k') && advanceAndMatch('i') && advanceAndMatch('p')) {
+                    return new Token(TokenType.SKIP, fileName, String.valueOf(line), String.valueOf(lineColumn), "skip");
                 }
-                else if (goBack(3) && advanceAndMatch('u') && advanceAndMatch('b')) {
-                    return new Token(TokenType.SUB, fileName, String.valueOf(line), String.valueOf(column), "sub");
+                else if (goBack(this.seekValue) && advanceAndMatch('u') && advanceAndMatch('b')) {
+                    return new Token(TokenType.SUB, fileName, String.valueOf(line), String.valueOf(lineColumn), "sub");
                 }
                 else {
                     return null;
@@ -79,7 +81,7 @@ public class Lexer {
             }
             case 'o' -> {
                 if (advanceAndMatch('r')) {
-                    return new Token(TokenType.OR, fileName, String.valueOf(line), String.valueOf(column), "or");
+                    return new Token(TokenType.OR, fileName, String.valueOf(line), String.valueOf(lineColumn), "or");
                 }
                 else {
                     return null;
@@ -87,10 +89,10 @@ public class Lexer {
             }
             case 'a' -> {
                 if (advanceAndMatch('n') && advanceAndMatch('d')) {
-                    return new Token(TokenType.AND, fileName, String.valueOf(line), String.valueOf(column), "and");
+                    return new Token(TokenType.AND, fileName, String.valueOf(line), String.valueOf(lineColumn), "and");
                 }
-                else if (goBack(2) && advanceAndMatch('d') && advanceAndMatch('d')) {
-                    return new Token(TokenType.ADD, fileName, String.valueOf(line), String.valueOf(column), "add");
+                else if (goBack(this.seekValue) && advanceAndMatch('d') && advanceAndMatch('d')) {
+                    return new Token(TokenType.ADD, fileName, String.valueOf(line), String.valueOf(lineColumn), "add");
                 }
                 else {
                     return null;
@@ -98,13 +100,13 @@ public class Lexer {
             }
             case 'e' -> {
                 if (advanceAndMatch('q')) {
-                    return new Token(TokenType.EQ, fileName, String.valueOf(line), String.valueOf(column), "eq");
+                    return new Token(TokenType.EQ, fileName, String.valueOf(line), String.valueOf(lineColumn), "eq");
                 }
-                else if (goBack(1) && advanceAndMatch('l') && advanceAndMatch('s') && advanceAndMatch('e')) {
-                    return new Token(TokenType.ELSE, fileName, String.valueOf(line), String.valueOf(column), "else");
+                else if (goBack(this.seekValue) && advanceAndMatch('l') && advanceAndMatch('s') && advanceAndMatch('e')) {
+                    return new Token(TokenType.ELSE, fileName, String.valueOf(line), String.valueOf(lineColumn), "else");
                 }
-                if (goBack(3) && advanceAndMatch('n') && advanceAndMatch('d')) {
-                    return new Token(TokenType.END, fileName, String.valueOf(line), String.valueOf(column), "end");
+                if (goBack(this.seekValue) && advanceAndMatch('n') && advanceAndMatch('d')) {
+                    return new Token(TokenType.END, fileName, String.valueOf(line), String.valueOf(lineColumn), "end");
                 }
                 else {
                     return null;
@@ -112,7 +114,7 @@ public class Lexer {
             }
             case 'g' -> {
                 if (advanceAndMatch('t')) {
-                    return new Token(TokenType.GT, fileName, String.valueOf(line), String.valueOf(column), "gt");
+                    return new Token(TokenType.GT, fileName, String.valueOf(line), String.valueOf(lineColumn), "gt");
                 }
                 else {
                     return null;
@@ -120,10 +122,10 @@ public class Lexer {
             }
             case 'm' -> {
                 if (advanceAndMatch('u') && advanceAndMatch('l')) {
-                    return new Token(TokenType.MUL, fileName, String.valueOf(line), String.valueOf(column), "mul");
+                    return new Token(TokenType.MUL, fileName, String.valueOf(line), String.valueOf(lineColumn), "mul");
                 }
-                if (goBack(2) && advanceAndMatch('a') && advanceAndMatch('i') && advanceAndMatch('n')) {
-                    return new Token(TokenType.MAIN, fileName, String.valueOf(line), String.valueOf(column), "main");
+                if (goBack(this.seekValue) && advanceAndMatch('a') && advanceAndMatch('i') && advanceAndMatch('n')) {
+                    return new Token(TokenType.MAIN, fileName, String.valueOf(line), String.valueOf(lineColumn), "main");
                 }
                 else {
                     return null;
@@ -131,7 +133,7 @@ public class Lexer {
             }
             case 'd' -> {
                 if (advanceAndMatch('i') && advanceAndMatch('v')){
-                    return new Token(TokenType.DIV, fileName, String.valueOf(line), String.valueOf(column), "div");
+                    return new Token(TokenType.DIV, fileName, String.valueOf(line), String.valueOf(lineColumn), "div");
                 }
                 else {
                     return null;
@@ -139,10 +141,10 @@ public class Lexer {
             }
             case 't' -> {
                 if (advanceAndMatch('h') && advanceAndMatch('e') && advanceAndMatch('n')){
-                    return new Token(TokenType.THEN, fileName, String.valueOf(line), String.valueOf(column), "then");
+                    return new Token(TokenType.THEN, fileName, String.valueOf(line), String.valueOf(lineColumn), "then");
                 }
-                else if (goBack(3) && advanceAndMatch('e') && advanceAndMatch('x') && advanceAndMatch('t')){
-                    return new Token(TokenType.VTEXT, fileName, String.valueOf(line), String.valueOf(column), "text");
+                else if (goBack(this.seekValue) && advanceAndMatch('e') && advanceAndMatch('x') && advanceAndMatch('t')){
+                    return new Token(TokenType.VTEXT, fileName, String.valueOf(line), String.valueOf(lineColumn), "text");
                 }
                 else {
                     return null;
@@ -150,7 +152,7 @@ public class Lexer {
             }
             case 'v' -> {
                 if (advanceAndMatch('o') && advanceAndMatch('i') && advanceAndMatch('d')) {
-                    return new Token(TokenType.FVOID, fileName, String.valueOf(line), String.valueOf(column), "void");
+                    return new Token(TokenType.FVOID, fileName, String.valueOf(line), String.valueOf(lineColumn), "void");
                 }
                 else {
                     return null;
@@ -158,7 +160,7 @@ public class Lexer {
             }
             case 'b' -> {
                 if (advanceAndMatch('e') && advanceAndMatch('g') && advanceAndMatch('i') && advanceAndMatch('n')){
-                    return new Token(TokenType.BEGIN, fileName, String.valueOf(line), String.valueOf(column), "begin");
+                    return new Token(TokenType.BEGIN, fileName, String.valueOf(line), String.valueOf(lineColumn), "begin");
                 }
                 else {
                     return null;
@@ -166,7 +168,7 @@ public class Lexer {
             }
             case 'i' -> {
                 if (advanceAndMatch('f')) {
-                    return new Token(TokenType.IF, fileName, String.valueOf(line), String.valueOf(column), "if");
+                    return new Token(TokenType.IF, fileName, String.valueOf(line), String.valueOf(lineColumn), "if");
                 }
                 else {
                     return null;
@@ -174,7 +176,7 @@ public class Lexer {
             }
             case 'h' -> {
                 if (advanceAndMatch('a') && advanceAndMatch('l') && advanceAndMatch('t')) {
-                    return new Token(TokenType.HALT, fileName, String.valueOf(line), String.valueOf(column), "halt");
+                    return new Token(TokenType.HALT, fileName, String.valueOf(line), String.valueOf(lineColumn), "halt");
                 }
                 else {
                     return null;
@@ -182,7 +184,7 @@ public class Lexer {
             }
             case 'p' -> {
                 if (advanceAndMatch('r') && advanceAndMatch('i') && advanceAndMatch('n') && advanceAndMatch('t')) {
-                    return new Token(TokenType.PRINT, fileName, String.valueOf(line), String.valueOf(column), "print");
+                    return new Token(TokenType.PRINT, fileName, String.valueOf(line), String.valueOf(lineColumn), "print");
                 }
                 else {
                     return null;
@@ -218,7 +220,7 @@ public class Lexer {
                         while (Character.isLetterOrDigit(this.source.charAt(this.column))) {
                             advance();
                         }
-                        return new Token(TokenType.FNAME, fileName, String.valueOf(line), String.valueOf(column), value);
+                        return new Token(TokenType.FNAME, fileName, String.valueOf(line), String.valueOf(lineColumn), value);
                     }
                 }
                 return null;
@@ -243,7 +245,7 @@ public class Lexer {
                     advance();
                     //expecting closing quote
                     if (this.source.charAt(this.column) == '"') {
-                        return new Token(TokenType.TEXTLIT, fileName, String.valueOf(line), String.valueOf(column), value);
+                        return new Token(TokenType.TEXTLIT, fileName, String.valueOf(line), String.valueOf(lineColumn), value);
                     }
                 }
                 return null;
@@ -251,12 +253,11 @@ public class Lexer {
             case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-' -> {
                 // match regex ^(0|-?0\.[0-9]*[1-9]|-?[1-9][0-9]*|-?[1-9][0-9]*\.[0-9]*[1-9])$
                 goBack(1);
-                if (advanceAndMatch('0') || (advanceAndMatch('-') && advanceAndMatch('0'))) {
-                    if (this.source.charAt(this.column) != '.') {
-                        return new Token(TokenType.NUMLIT, fileName, String.valueOf(line), String.valueOf(column), "0");
+                if (advanceAndMatch('0')) {
+                    if (!advanceAndMatch('.')) {
+                        return new Token(TokenType.NUMLIT, fileName, String.valueOf(line), String.valueOf(lineColumn), "0");
                     }
-                    String value = "";
-                    value += this.current;
+                    String value = "0.";
                     while (Character.isDigit(this.source.charAt(this.column))) {
                         value += this.current;
                         advance();
@@ -267,10 +268,26 @@ public class Lexer {
                         return null;
                     }
 
-                    return new Token(TokenType.NUMLIT, fileName, String.valueOf(line), String.valueOf(column), value);  
+                    return new Token(TokenType.NUMLIT, fileName, String.valueOf(line), String.valueOf(lineColumn), value);  
                 }
-                else if(goBack(2) && advanceAndMatch('-') && Character.isDigit(this.source.charAt(this.column))
-                && this.source.charAt(this.column) != '0') {
+                else if(goBack(this.seekValue) && advanceAndMatch('-') && advanceAndMatch('0')) {
+                    if (!advanceAndMatch('.')) {
+                        return new Token(TokenType.NUMLIT, fileName, String.valueOf(line), String.valueOf(lineColumn), "-0");
+                    }
+                    String value = "-0.";
+                    while (Character.isDigit(this.source.charAt(this.column))) {
+                        value += this.current;
+                        advance();
+                    }
+
+                    // if last character in value is not equal to 1-9 return null
+                    if (value.charAt(value.length() - 1) == '0') {
+                        return null;
+                    }
+
+                    return new Token(TokenType.NUMLIT, fileName, String.valueOf(line), String.valueOf(lineColumn), value);
+                }
+                else if(goBack(this.seekValue) && advanceAndMatch('-') && Character.isDigit(this.source.charAt(this.column))) {
                     String value = "-";
                     value += this.current;
                     advance();
@@ -279,7 +296,7 @@ public class Lexer {
                         advance();
                     }
                     if (this.source.charAt(this.column) != '.') {
-                        return new Token(TokenType.NUMLIT, fileName, String.valueOf(line), String.valueOf(column), value);
+                        return new Token(TokenType.NUMLIT, fileName, String.valueOf(line), String.valueOf(lineColumn), value);
                     }
                     value += this.current;
                     advance();
@@ -290,19 +307,41 @@ public class Lexer {
                     if (value.charAt(value.length() - 1) == '0') {
                         return null;
                     }
-                    return new Token(TokenType.NUMLIT, fileName, String.valueOf(line), String.valueOf(column), value);
+                    return new Token(TokenType.NUMLIT, fileName, String.valueOf(line), String.valueOf(lineColumn), value);
+                }
+                else if(goBack(this.seekValue) && Character.isDigit(this.source.charAt(this.column))) {
+                    String value = "";
+                    value += this.current;
+                    advance();
+                    while (Character.isDigit(this.source.charAt(this.column))) {
+                        value += this.current;
+                        advance();
+                    }
+                    if (this.source.charAt(this.column) != '.') {
+                        return new Token(TokenType.NUMLIT, fileName, String.valueOf(line), String.valueOf(lineColumn), value);
+                    }
+                    value += this.current;
+                    advance();
+                    while (Character.isDigit(this.source.charAt(this.column))) {
+                        value += this.current;
+                        advance();
+                    }
+                    if (value.charAt(value.length() - 1) == '0') {
+                        return null;
+                    }
+                    return new Token(TokenType.NUMLIT, fileName, String.valueOf(line), String.valueOf(lineColumn), value);
                 }
                 else {
                     return null;
                 }
             }
-            case ' ', '\r', '\t' -> {
-                return new Token(TokenType.NULLTYPE, fileName, String.valueOf(line), String.valueOf(column), String.valueOf(c));
+            case ' ', '\r', '\t', '\0' -> {
+                return new Token(TokenType.NULLTYPE, fileName, String.valueOf(line), String.valueOf(lineColumn), String.valueOf(c));
             }
             case '\n' -> {
                 line++;
-                column = 1;
-                return new Token(TokenType.NULLTYPE, fileName, String.valueOf(line), String.valueOf(column), String.valueOf(c));
+                lineColumn = 0;
+                return new Token(TokenType.NULLTYPE, fileName, String.valueOf(line), String.valueOf(lineColumn), String.valueOf(c));
             }
             default -> {
                 return null;
@@ -310,25 +349,25 @@ public class Lexer {
         }
     }
 
-    private boolean isAtEnd() {
-        return this.column >= this.source.length();
-    }
+    private boolean isAtEnd() { return this.column >= this.source.length() - 1;}
 
     private char advance() {
-        this.column++;
-        return this.current = this.source.charAt(this.column);
+        if (this.column + 1 >= this.source.length()) {
+            return '\0';
+        }
+        ++this.lineColumn;
+        return this.current = this.source.charAt(++this.column);
     }
 
     private boolean advanceAndMatch(char expected) {
-        this.column++;
-        if (this.column >= this.source.length()) {
-            return false;
-        }
-        return this.source.charAt(this.column) == expected;
+        char c = advance();
+        ++this.seekValue;
+        return c == expected;
     }
 
     private boolean goBack(int steps) {
         this.column -= steps;
+        this.seekValue = 0;
         return true;
     }
 }

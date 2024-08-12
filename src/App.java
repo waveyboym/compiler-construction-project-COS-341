@@ -4,7 +4,14 @@ public class App {
     public static void main(String[] args) throws Exception {
         // receive file path from command line arguments
         // example: java App src/test.txt
-        String path = args[0];
+        String path;
+
+        if (args.length != 1) {
+            path = "input/input.txt";
+        } else {
+            path = args[0];
+        }
+
         // read file contents
         String contents = FileReader.readFileAndReturnContents(path);
 
