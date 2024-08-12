@@ -13,14 +13,14 @@ public class App {
         }
 
         // read file contents
-        String contents = FileReader.readFileAndReturnContents(path);
+        String contents = FileManager.readFileAndReturnContents(path);
 
         try {
             Lexer lexer = new Lexer(contents, path);
             List<Token> tokens = lexer.scanTokens();
-            for (Token token : tokens) {
-                System.out.println(token.type + " " + token);
-            }
+            XMLGenerator xmlGenerator = new XMLGenerator(tokens);
+            String xml = xmlGenerator.generateXML();
+            FileManager.createAndWriteFile("out/output.xml", xml);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
