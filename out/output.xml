@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TOKENSTREAM>
   <TOK>
-    <ID>f41b8159-7a89-4b09-875a-7ad5f5e1fa73</ID>
+    <ID>4774bccf-e80f-4676-900b-a6ebcbe93801</ID>
     <CLASS>MAIN</CLASS>
     <WORD>main</WORD>
   </TOK>
   <TOK>
-    <ID>735adca2-1bb9-4d0f-aa9c-c7ed44179e3e</ID>
+    <ID>c39293fd-dbd2-4a57-88de-89cefb64d0e4</ID>
     <CLASS>NUM</CLASS>
     <WORD>num</WORD>
   </TOK>
   <TOK>
-    <ID>c21430cf-ec23-4335-bd2b-80c1d82b3d9d</ID>
+    <ID>4c4bd5f1-7c71-4f4c-a59c-3b5879b76d41</ID>
     <CLASS>VTEXT</CLASS>
     <WORD>text</WORD>
   </TOK>
   <TOK>
-    <ID>d08e11e3-077d-4c3d-9a3c-7ada45efa00a</ID>
+    <ID>126657a8-c3b9-4742-95fc-ab92b20a77b2</ID>
     <CLASS>SKIP</CLASS>
     <WORD>skip</WORD>
   </TOK>
   <TOK>
-    <ID>fd84826f-00f6-4ada-8ae0-44c220b280de</ID>
+    <ID>295fe57c-6860-449e-a3b1-a5c06d614bf8</ID>
     <CLASS>HALT</CLASS>
     <WORD>halt</WORD>
   </TOK>
   <TOK>
-    <ID>eea058a0-10b2-4d69-8482-3efc5c93caf6</ID>
+    <ID>a3ebfae6-977b-4242-9d96-f94be1fbc8b3</ID>
     <CLASS>NOT</CLASS>
     <WORD>not</WORD>
   </TOK>

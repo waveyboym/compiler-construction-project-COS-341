@@ -1,6 +1,12 @@
 import java.util.List;
 
 public class App {
+
+    public static void printTokens(List<Token> tokens) {
+        for (Token token : tokens) {
+            System.out.println(token);
+        }
+    }
     public static void main(String[] args) throws Exception {
         // receive file path from command line arguments
         // example: java App src/test.txt
@@ -18,6 +24,7 @@ public class App {
         try {
             Lexer lexer = new Lexer(contents, path);
             List<Token> tokens = lexer.scanTokens();
+            printTokens(tokens);
             XMLGenerator xmlGenerator = new XMLGenerator(tokens);
             String xml = xmlGenerator.generateXML();
             FileManager.createAndWriteFile("out/output.xml", xml);
