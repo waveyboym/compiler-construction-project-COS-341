@@ -1,7 +1,7 @@
 public enum TokenType {
     // Single-character tokens.
     LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE,
-    COMMA, SEMICOLON,
+    COMMA, SEMICOLON, EQUAL_SIGN, LESS_THAN_SIGN,
 
     // Unary operators.
     NOT, SQRT,
