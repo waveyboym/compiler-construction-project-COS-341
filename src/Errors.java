@@ -17,7 +17,7 @@ public class Errors {
                     .append("\n");
 
         // Create the indicator line
-        for (int i = 1; i < column; i++) {
+        for (int i = 0; i < column; i++) {
             errorBuilder.append(" ");
         }
         errorBuilder.append("^\n");

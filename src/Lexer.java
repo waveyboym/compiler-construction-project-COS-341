@@ -24,7 +24,7 @@ public class Lexer {
         while (!isAtEnd()) {
             Token token = processCurrentChar();
             if (token == null){
-                System.out.println(Errors.formatError(fileName, line, column + 1, current, currentLine));
+                System.out.println(Errors.formatError(fileName, line, column, current, currentLine));
                 return new ArrayList<>();
             }
             if (token.type != TokenType.NULLTYPE) {
