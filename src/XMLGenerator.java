@@ -12,6 +12,9 @@ public class XMLGenerator {
         xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
         xml.append("<TOKENSTREAM>\n");
         for (Token token : tokens) {
+            if (token.type == TokenType.NULLTYPE) {
+                continue;
+            }
             xml.append("  <TOK>\n");
             xml.append("    <ID>").append(token.uuid).append("</ID>\n");
             xml.append("    <CLASS>").append(token.type).append("</CLASS>\n");

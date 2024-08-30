@@ -24,11 +24,7 @@ public class Lexer {
         while (!isAtEnd()) {
             Token token = processCurrentChar();
             if (token == null){
-                System.out.println(Errors.formatError(fileName, line, column, current, currentLine));
-                return new ArrayList<>();
-            }
-            if (token.type != TokenType.NULLTYPE) {
-                tokens.add(token);
+                throw new RuntimeException(Errors.formatLexerError(fileName, line, column, current, currentLine));
             }
             this.seekValue = 0;
             advance();
@@ -197,6 +193,14 @@ public class Lexer {
             case 'p' -> {
                 if (advanceAndMatch('r') && advanceAndMatch('i') && advanceAndMatch('n') && advanceAndMatch('t')) {
                     return new Token(TokenType.PRINT, fileName, String.valueOf(line), lineColumn, "print");
+                }
+                else {
+                    return null;
+                }
+            }
+            case 'r' -> {
+                if (advanceAndMatch('e') && advanceAndMatch('t') && advanceAndMatch('u') && advanceAndMatch('r') && advanceAndMatch('n')) {
+                    return new Token(TokenType.RETURN, fileName, String.valueOf(line), lineColumn, "return");
                 }
                 else {
                     return null;

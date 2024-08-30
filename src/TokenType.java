@@ -20,7 +20,7 @@ public enum TokenType {
 
     // Keywords.
     BEGIN, END, IF, THEN, ELSE, SKIP, HALT, PRINT, 
-    INPUT, MAIN, 
+    INPUT, MAIN, RETURN,
 
     // Null, this token will be discarded in the lexing phase
     NULLTYPE,

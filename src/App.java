@@ -24,7 +24,6 @@ public class App {
         try {
             Lexer lexer = new Lexer(contents, path);
             List<Token> tokens = lexer.scanTokens();
-            printTokens(tokens);
             XMLGenerator xmlGenerator = new XMLGenerator(tokens);
             String xml = xmlGenerator.generateXML();
             FileManager.createAndWriteFile("out/output.xml", xml);

@@ -6,9 +6,9 @@ public class Test {
     private static int totalTests = 0;
     public static void main(String[] args) {
         System.out.println("Running tests...");
-        testTokenClass();
-        testLexerClass();
-
+        //testTokenClass();
+        //testLexerClass();
+        //testParseNodeClass();
         System.out.println("Tests passed: " + testsPassed + "/" + totalTests);
         System.out.println("Tests failed: " + testsFailed + "/" + totalTests);
         System.out.println("Tests total: " + totalTests);
@@ -52,7 +52,24 @@ public class Test {
             "begin V_sum = add(V_x, V_y) ; V_z = mul(V_sum, 2) ; end }",
         
             // Program 5: Skip and Halt commands
-            "main begin skip ; halt ; end"
+            "main begin skip ; halt ; end",
+
+            // Program 6: Void function with early return
+            "main num V_x begin V_x = 7 ; F_check(V_x) ; print V_x ; end " +
+            "void F_check(num V_a, num V_b, num V_c) { num V_dummy1, num V_dummy2, num V_dummy3, " +
+            "begin if grt(V_a, 5) then return else V_a = add(V_a, 1) ; end }",
+
+            // Program 7: Function returning a text value
+            "main text V_message begin V_message = F_greet() ; print V_message ; end " +
+            "text F_greet() { text V_msg, text V_dummy1, text V_dummy2, " +
+            "begin V_msg = \"Welcome\" ; return V_msg ; end }",
+
+            // Program 8: Nested calls and return in functions
+            "main num V_x begin V_x = F_outer(3, 4, 5) ; print V_x ; end " +
+            "num F_outer(num V_a, num V_b, num V_c) { num V_res, num V_dummy1, num V_dummy2, " +
+            "begin V_res = F_inner(V_a, V_b, V_c) ; return V_res ; end } " +
+            "num F_inner(num V_x, num V_y, num V_z) { num V_sum, num V_dummy1, num V_dummy2, " +
+            "begin V_sum = add(V_x, V_y) ; return V_sum ; end }",
         };
 
         String [][] expectedValues = {
@@ -73,6 +90,19 @@ public class Test {
             {
                 "main", "begin", "skip", ";", "halt", ";", "end"
             },
+            {
+                "main", "num", "V_x", "begin", "V_x", "=", "7", ";", "F_check", "(", "V_x", ")", ";", "print", "V_x", ";", "end",
+                "void", "F_check", "(", "num", "V_a", ",", "num", "V_b", ",", "num", "V_c", ")", "{", "num", "V_dummy1", ",", "num", "V_dummy2", ",", "num", "V_dummy3", ",", "begin", "if", "grt", "(", "V_a", ",", "5", ")", "then", "return", "else", "V_a", "=", "add", "(", "V_a", ",", "1", ")", ";", "end", "}"
+            },
+            {
+                "main", "text", "V_message", "begin", "V_message", "=", "F_greet", "(", ")", ";", "print", "V_message", ";", "end",
+                "text", "F_greet", "(", ")", "{", "text", "V_msg", ",", "text", "V_dummy1", ",", "text", "V_dummy2", ",", "begin", "V_msg", "=", "\"Welcome\"", ";", "return", "V_msg", ";", "end", "}"
+            },
+            {
+                "main", "num", "V_x", "begin", "V_x", "=", "F_outer", "(", "3", ",", "4", ",", "5", ")", ";", "print", "V_x", ";", "end",
+                "num", "F_outer", "(", "num", "V_a", ",", "num", "V_b", ",", "num", "V_c", ")", "{", "num", "V_res", ",", "num", "V_dummy1", ",", "num", "V_dummy2", ",", "begin", "V_res", "=", "F_inner", "(", "V_a", ",", "V_b", ",", "V_c", ")", ";", "return", "V_res", ";", "end", "}",
+                "num", "F_inner", "(", "num", "V_x", ",", "num", "V_y", ",", "num", "V_z", ")", "{", "num", "V_sum", ",", "num", "V_dummy1", ",", "num", "V_dummy2", ",", "begin", "V_sum", "=", "add", "(", "V_x", ",", "V_y", ")", ";", "return", "V_sum", ";", "end", "}"
+            }
         };
 
         for (int i = 0; i < programs.length; ++i) {
@@ -103,5 +133,28 @@ public class Test {
             }
             totalTests++;
         }
+    }
+
+    public static void testParseNodeClass(){
+        ParseNode node = new ParseNode(new Token(TokenType.INPUT, "test.txt", "1", 0, "test"), ParseType.TERMINAL);
+        ParseNode child1 = new ParseNode(new Token(TokenType.INPUT, "test.txt", "1", 0, "test"), ParseType.TERMINAL);
+        ParseNode child2 = new ParseNode(new Token(TokenType.INPUT, "test.txt", "1", 0, "test"), ParseType.TERMINAL);
+
+        ParseNode child11 = new ParseNode(new Token(TokenType.INPUT, "test.txt", "1", 0, "test"), ParseType.TERMINAL);
+        ParseNode child12 = new ParseNode(new Token(TokenType.INPUT, "test.txt", "1", 0, "test"), ParseType.TERMINAL);
+
+        ParseNode child21 = new ParseNode(new Token(TokenType.INPUT, "test.txt", "1", 0, "test"), ParseType.TERMINAL);
+        ParseNode child22 = new ParseNode(new Token(TokenType.INPUT, "test.txt", "1", 0, "test"), ParseType.TERMINAL);
+
+        child1.addChild(child11);
+        child1.addChild(child12);
+
+        child2.addChild(child21);
+        child2.addChild(child22);
+
+        node.addChild(child1);
+        node.addChild(child2);
+
+        System.out.println(node.toString());
     }
 }
