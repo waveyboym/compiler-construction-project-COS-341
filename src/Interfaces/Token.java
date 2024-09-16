@@ -1,3 +1,4 @@
+package Interfaces;
 public class Token {
     public TokenType type;
     public String uuid;

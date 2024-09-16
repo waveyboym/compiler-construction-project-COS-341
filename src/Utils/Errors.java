@@ -1,3 +1,7 @@
+package Utils;
+
+import Interfaces.Token;
+
 public class Errors {
     public static String formatLexerError(String filename, int line, int column, char invalidChar, String lineContent) {
         StringBuilder errorBuilder = new StringBuilder();

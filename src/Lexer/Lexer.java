@@ -1,5 +1,11 @@
+package Lexer;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import Interfaces.Token;
+import Interfaces.TokenType;
+import Utils.Errors;
 
 public class Lexer {
     private final String source;

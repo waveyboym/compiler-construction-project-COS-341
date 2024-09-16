@@ -1,3 +1,8 @@
+import Interfaces.ParseNode;
+import Interfaces.ParseType;
+import Interfaces.Token;
+import Interfaces.TokenType;
+import Lexer.Lexer;
 import java.util.List;
 
 public class Test {
@@ -7,7 +12,7 @@ public class Test {
     public static void main(String[] args) {
         System.out.println("Running tests...");
         //testTokenClass();
-        //testLexerClass();
+        testLexerClass();
         //testParseNodeClass();
         System.out.println("Tests passed: " + testsPassed + "/" + totalTests);
         System.out.println("Tests failed: " + testsFailed + "/" + totalTests);

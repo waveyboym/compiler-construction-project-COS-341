@@ -1,3 +1,9 @@
+package Parser;
+import Interfaces.ParseNode;
+import Interfaces.ParseType;
+import Interfaces.Token;
+import Interfaces.TokenType;
+import Utils.Errors;
 import java.util.List;
 
 public class Parser {
@@ -248,15 +254,81 @@ public class Parser {
 
         // unop or binop
         if(this.current.type == TokenType.NOT || this.current.type == TokenType.SQRT){
-            node.addChild(parseUnop());
+            node = parseBinopSimpleBuilder(node);
         }
         else if(this.current.type == TokenType.OR || this.current.type == TokenType.AND || this.current.type == TokenType.EQ || this.current.type == TokenType.GT
                 || this.current.type == TokenType.ADD || this.current.type == TokenType.SUB || this.current.type == TokenType.MUL || this.current.type == TokenType.DIV){
-            node.addChild(parseBinop());
+            node = parseBinopBuilder(node, true);
         }
         else{
             throw new RuntimeException(Errors.formatParserError(this.current, "NOT, SQRT, OR, AND, EQ, GT, ADD, SUB, MUL, DIV", currentLine));
         }
+
+        return node;
+    }
+
+    private ParseNode parseBinop(Boolean recursive){
+        ParseNode node = new ParseNode();
+
+        if((this.current.type == TokenType.OR || this.current.type == TokenType.AND || this.current.type == TokenType.EQ || this.current.type == TokenType.GT
+                || this.current.type == TokenType.ADD || this.current.type == TokenType.SUB || this.current.type == TokenType.MUL || this.current.type == TokenType.DIV)
+                && recursive){
+            node = parseBinopSimpleBuilder(node);
+        } else {
+            node.addChild(parseAtomic());
+        }
+
+        return node;
+    }
+
+    private ParseNode parseBinopSimpleBuilder(ParseNode node){
+        // advance and expect (
+        this.advance();
+        if (this.current.type != TokenType.LEFT_PAREN) {
+            throw new RuntimeException(Errors.formatParserError(this.current, "(", currentLine));
+        }
+        node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+        node.addChild(parseBinopBuilder(new ParseNode(), false));
+        // advance and expect ,
+        this.advance();
+        if (this.current.type != TokenType.COMMA) {
+            throw new RuntimeException(Errors.formatParserError(this.current, ",", currentLine));
+        }
+        node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+        node.addChild(parseBinopBuilder(new ParseNode(), false));
+        // advance and expect )
+        this.advance();
+        if (this.current.type != TokenType.RIGHT_PAREN) {
+            throw new RuntimeException(Errors.formatParserError(this.current, ")", currentLine));
+        }
+        node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+
+        return node;
+    }
+
+    private ParseNode parseBinopBuilder(ParseNode node, Boolean recursive){
+        // advance and expect (
+        this.advance();
+        if (this.current.type != TokenType.LEFT_PAREN) {
+            throw new RuntimeException(Errors.formatParserError(this.current, "(", currentLine));
+        }
+        node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+        node.addChild(parseBinop(recursive));
+        // advance and expect ,
+        this.advance();
+        if (this.current.type != TokenType.COMMA) {
+            throw new RuntimeException(Errors.formatParserError(this.current, ",", currentLine));
+        }
+        node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+        node.addChild(parseBinop(recursive));
+        // advance and expect )
+        this.advance();
+        if (this.current.type != TokenType.RIGHT_PAREN) {
+            throw new RuntimeException(Errors.formatParserError(this.current, ")", currentLine));
+        }
+        node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+
+        return node;
     }
 
 }

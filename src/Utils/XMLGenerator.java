@@ -1,4 +1,8 @@
+package Utils;
 import java.util.List;
+
+import Interfaces.Token;
+import Interfaces.TokenType;
 
 public class XMLGenerator {
     private final List<Token> tokens;
