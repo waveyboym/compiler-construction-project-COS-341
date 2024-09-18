@@ -1,11 +1,10 @@
 package Lexer;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import Interfaces.Token;
 import Interfaces.TokenType;
 import Utils.Errors;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Lexer {
     private final String source;
@@ -34,6 +33,9 @@ public class Lexer {
             }
             this.seekValue = 0;
             advance();
+
+            // add token to list if not null
+            tokens.add(token);
         }
         return tokens;
     }

@@ -1,7 +1,7 @@
 import Interfaces.Token;
+import Lexer.Lexer;
 import Utils.FileManager;
 import Utils.XMLGenerator;
-import Lexer.Lexer;
 import java.util.List;
 
 public class App {

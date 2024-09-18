@@ -23,10 +23,11 @@ public class FileManager {
     public static void createAndWriteFile(String path, String contents) {
         try {
             File file = new File(path);
+            // create file if it does not exist else overwrite
             if (file.createNewFile()) {
                 System.out.println("File created: " + file.getName());
             } else {
-                System.out.println("File already exists.");
+                System.out.println("File already exists. Overwriting...");
             }
             try (java.io.FileWriter writer = new java.io.FileWriter(path)) {
                 writer.write(contents);

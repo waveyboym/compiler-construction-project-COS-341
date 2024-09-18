@@ -1,3 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TOKENSTREAM>
+  <TOK>
+    <ID>1db6a3c3-5496-471d-88f3-d7305dbe236a</ID>
+    <CLASS>MAIN</CLASS>
+    <WORD>main</WORD>
+  </TOK>
+  <TOK>
+    <ID>6d5fc698-f96f-4e10-b6a8-4f875a5fd3fa</ID>
+    <CLASS>NUM</CLASS>
+    <WORD>num</WORD>
+  </TOK>
+  <TOK>
+    <ID>585a0cb9-d64f-4bf1-85d3-3eeb7e826ef5</ID>
+    <CLASS>VTEXT</CLASS>
+    <WORD>text</WORD>
+  </TOK>
+  <TOK>
+    <ID>6aa40cd7-beae-4b99-b75e-67319df22648</ID>
+    <CLASS>SKIP</CLASS>
+    <WORD>skip</WORD>
+  </TOK>
+  <TOK>
+    <ID>abb89b41-0f8e-4189-9fa7-50262d0c6c90</ID>
+    <CLASS>HALT</CLASS>
+    <WORD>halt</WORD>
+  </TOK>
+  <TOK>
+    <ID>868506e7-3a5d-4008-b0be-15ef86ffb3b5</ID>
+    <CLASS>NOT</CLASS>
+    <WORD>not</WORD>
+  </TOK>
+  <TOK>
+    <ID>8f2bfc03-4c20-4c19-8691-ca115c4bc263</ID>
+    <CLASS>END</CLASS>
+    <WORD>end</WORD>
+  </TOK>
 </TOKENSTREAM>
