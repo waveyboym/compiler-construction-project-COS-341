@@ -40,6 +40,8 @@ public class Errors {
                     .append(token.Column)
                     .append(": error: expected ")
                     .append(expected)
+                    .append(" not: ")
+                    .append(token.Value)
                     .append("\n");
 
         // Add the entire line content
@@ -47,7 +49,7 @@ public class Errors {
                     .append("\n");
 
         // Create the indicator line
-        for (int i = 0; i < token.Column; i++) {
+        for (int i = 1; i < token.Column; i++) {
             errorBuilder.append(" ");
         }
         errorBuilder.append("^\n");

@@ -10,25 +10,58 @@ public class Parser {
     private final List<Token> tokens;
     private Token current;
     private int index;
+    private int line;
     private String currentLine;
     
     public Parser(List<Token> tokens) {
         this.tokens = tokens;
-        this.index = 0;
-        this.current = tokens.get(this.index);
-        this.currentLine = this.current.Value;
+        this.index = -1;
+        this.line = 0;
+        this.current = null;
+        this.currentLine = "";
+        this.advance();
     }
     
     private Token advance(){
-        if (this.index < this.tokens.size()) {
-            while(this.current.type == TokenType.NULLTYPE && this.index < this.tokens.size()){
-                this.index++;
-                this.current = this.tokens.get(this.index);
+        if (this.index + 1 < this.tokens.size()) {
+            this.index++;
+            this.current = this.tokens.get(this.index);
+            if(this.current.Line != this.line){
+                this.line = this.current.Line;
+                this.currentLine = this.current.Value;
+            } else {
                 this.currentLine += this.current.Value;
             }
+
+            while(this.current.type == TokenType.NULLTYPE && this.index + 1 < this.tokens.size()){
+                this.index++;
+                this.current = this.tokens.get(this.index);
+                if(this.current.Line != this.line){
+                    this.line = this.current.Line;
+                    this.currentLine = this.current.Value;
+                } else {
+                    this.currentLine += this.current.Value;
+                }
+            }
             return this.current;
-        } else {
-            return null;
+        } else if( this.current.type == TokenType.END){
+            return this.current;
+        }
+        else {
+            // throw error that we reached unexpected EOF without fully building the syntax tree
+            throw new RuntimeException(Errors.formatParserError(this.current, "Reached unexpected EOF with incomplete parse tree", currentLine));
+        }
+    }
+
+    private void matchType(TokenType type){
+        if(this.current.type != type){
+            throw new RuntimeException(Errors.formatParserError(this.current, type.toString(), currentLine));
+        }
+    }
+
+    private void matchTwoTypes(TokenType type1, TokenType type2){
+        if(this.current.type != type1 && this.current.type != type2){
+            throw new RuntimeException(Errors.formatParserError(this.current, type1.toString() + " or " + type2.toString(), currentLine));
         }
     }
 
@@ -37,12 +70,10 @@ public class Parser {
     }
 
     private ParseNode parsePROG() {
-        ParseNode node = new ParseNode();
+        ParseNode node = new ParseNode("PROG");
 
         // main
-        if (this.current.type != TokenType.MAIN) {
-            throw new RuntimeException(Errors.formatParserError(this.current, "main", currentLine));
-        }
+        matchType(TokenType.MAIN);
         node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
         this.advance();
 
@@ -59,24 +90,25 @@ public class Parser {
     }
 
     private ParseNode parseGLOBVARS() {
-        ParseNode node = new ParseNode();
+        ParseNode node = new ParseNode("GLOBVARS");
+
+        if(this.current.type == TokenType.BEGIN){
+            return null;
+        }
 
         // VTYPE
-        if (this.current.type != TokenType.NUM && this.current.type != TokenType.VTEXT) {
-            throw new RuntimeException(Errors.formatParserError(this.current, "VTYPE", currentLine));
-        }
+        matchTwoTypes(TokenType.NUM, TokenType.VTEXT);
         node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
         this.advance();
 
         // VNAME
-        if (this.current.type != TokenType.VNAME) {
-            throw new RuntimeException(Errors.formatParserError(this.current, "VNAME", currentLine));
-        }
+        matchType(TokenType.VNAME);
         node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
         this.advance();
 
         // if "," then parse GLOBVARS else return node
         if (this.current.type == TokenType.COMMA) {
+            node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
             this.advance();
             node.addChild(parseGLOBVARS());
         }
@@ -85,41 +117,164 @@ public class Parser {
     }
 
     private ParseNode parseAlgo(){
-        ParseNode node = new ParseNode();
+        ParseNode node = new ParseNode("ALGO");
 
         // begin
-        if (this.current.type != TokenType.BEGIN) {
-            throw new RuntimeException(Errors.formatParserError(this.current, "begin", currentLine));
-        }
+        matchType(TokenType.BEGIN);
+        node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+        this.advance();
 
         // instruc
-        this.advance();
         node.addChild(parseInstruc());
 
         // end
-        if (this.current.type != TokenType.END) {
-            throw new RuntimeException(Errors.formatParserError(this.current, "end", currentLine));
-        }
+        matchType(TokenType.END);
+        node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+        this.advance();
 
         return node;
     }
 
     private ParseNode parseFUNCTIONS(){
-        ParseNode node = new ParseNode();
+        ParseNode node = new ParseNode("FUNCTIONS");
 
-        // function
+        if(this.current.type == TokenType.END){
+            return null;
+        }
+
+        // match header
+        node.addChild(parseFuncHeader());
+
+        // match body
+        node.addChild(parseFuncBody());
+
+        // match another header type
+        if(this.current.type == TokenType.NUM || this.current.type == TokenType.FVOID){
+            node.addChild(parseFUNCTIONS());
+        }
+
+        return node;
+    }
+
+    private ParseNode parseFuncHeader(){
+        ParseNode node = new ParseNode("HEADER");
+
+        // match ftype
+        matchTwoTypes(TokenType.NUM, TokenType.FVOID);
+        node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+        this.advance();
+
+        // match fname
+        matchType(TokenType.FNAME);
+        node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+        this.advance();
+
+        // (
+        matchType(TokenType.LEFT_PAREN);
+        node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+        this.advance();
+
+        // match 3 vnames
+        // vname 1
+        matchType(TokenType.VNAME);
+        node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+        this.advance();
+
+        // ,
+        matchType(TokenType.COMMA);
+        node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+        this.advance();
+
+        // vname 2
+        matchType(TokenType.VNAME);
+        node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+        this.advance();
+
+        // ,
+        matchType(TokenType.COMMA);
+        node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+        this.advance();
+
+        // vname 3
+        matchType(TokenType.VNAME);
+        node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+        this.advance();
+
+        // )
+        matchType(TokenType.RIGHT_PAREN);
+        node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+        this.advance();
+
+        return node;
+    }
+
+    private ParseNode parseFuncBody(){
+        ParseNode node = new ParseNode("BODY");
+
+        // {
+        matchType(TokenType.LEFT_BRACE);
+        node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+        this.advance();
+
+        // locvars
+        node.addChild(parseLocalVars(3));
+
+        // algo
+        node.addChild(parseAlgo());
+
+        // }
+        matchType(TokenType.RIGHT_BRACE);
+        node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+        this.advance();
+
+        // subfunctions
+        if(this.current.type == TokenType.NUM || this.current.type == TokenType.FVOID){
+            node.addChild(parseFUNCTIONS());
+        }
+
+        // end
+        matchType(TokenType.END);
+        node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+        this.advance();
+
+        return node;
+    }
+
+    private ParseNode parseLocalVars(int levels){
+        ParseNode node = new ParseNode("LOCALVARS");
+
+        // VTYPE
+        matchTwoTypes(TokenType.NUM, TokenType.VTEXT);
+        node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+        this.advance();
+
+        // VNAME
+        matchType(TokenType.VNAME);
+        node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+        this.advance();
+
+        // if "," then parse LocalVars else return node
+        if (this.current.type == TokenType.COMMA && levels > 0) {
+            this.advance();
+            node.addChild(parseLocalVars(levels - 1));
+        }
 
         return node;
     }
 
     private ParseNode parseInstruc(){
-        ParseNode node = new ParseNode();
+        ParseNode node = new ParseNode("INSTRUC");
+
+        if(this.current.type == TokenType.END){
+            return null;
+        }
 
         // command
         node.addChild(parseCommand());
 
         // if ";" then parse Instruc else return node
         if (this.current.type == TokenType.SEMICOLON) {
+            node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
             this.advance();
             node.addChild(parseInstruc());
         }
@@ -128,18 +283,17 @@ public class Parser {
     }
 
     private ParseNode parseCommand(){
-        ParseNode node = new ParseNode();
+        ParseNode node = new ParseNode("COMMAND");
 
-        if(null == this.current.type){
-            throw new RuntimeException(Errors.formatParserError(this.current, "SKIP, HALT, PRINT, VNAME, FNAME, IF, INPUT", currentLine));
-        }
-        else switch (this.current.type) {
+        switch (this.current.type) {
             case SKIP -> {
                 node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+                this.advance();
                 return node;
             }
             case HALT -> {
                 node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+                this.advance();
                 return node;
             }
             case PRINT -> {
@@ -150,12 +304,12 @@ public class Parser {
             }
             case VNAME -> {
                 //ASSIGN
-                node.addChild(parseVNAME());
+                node.addChild(parseVNAMEASSIGN());
                 return node;
             }
             case FNAME -> {
                 //CALL
-                node.addChild(parseFNAME());
+                node.addChild(parseFNAMECALL());
                 return node;
             }
             case IF -> {
@@ -167,8 +321,36 @@ public class Parser {
         }
     }
 
+    private ParseNode parseVNAMEASSIGN(){
+        ParseNode node = new ParseNode("ASSIGN");
+
+        // VNAME
+        node.addChild(parseVNAME());
+
+        // < or =
+        TokenType type = this.current.type;
+        matchTwoTypes(TokenType.LESS_THAN_SIGN, TokenType.EQUAL_SIGN);
+        node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+        this.advance();
+
+        if(type == TokenType.LESS_THAN_SIGN){
+            // <
+            // expect input
+            matchType(TokenType.INPUT);
+            node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+            this.advance();
+        }
+        else{
+            // =
+            // TERM
+            node.addChild(parseTerm());
+        }
+
+        return node;
+    }
+
     private ParseNode parseAtomic(){
-        ParseNode node = new ParseNode();
+        ParseNode node = new ParseNode("ATOMIC");
 
         if(this.current.type == TokenType.VNAME){
             node.addChild(parseVNAME());
@@ -181,23 +363,49 @@ public class Parser {
     }
 
     private ParseNode parseVNAME(){
-        ParseNode node = new ParseNode();
+        ParseNode node = new ParseNode("VNAME");
 
-        if(this.current.type != TokenType.VNAME){
-            throw new RuntimeException(Errors.formatParserError(this.current, "VNAME", currentLine));
-        }
+        matchType(TokenType.VNAME);
         node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
         this.advance();
 
         return node;
     }
 
-    private ParseNode parseFNAME(){
-        ParseNode node = new ParseNode();
+    private ParseNode parseFNAMECALL(){
+        ParseNode node = new ParseNode("FNAME");
 
-        if(this.current.type != TokenType.FNAME){
-            throw new RuntimeException(Errors.formatParserError(this.current, "FNAME", currentLine));
-        }
+        // FNAME
+        matchType(TokenType.FNAME);
+        node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+        this.advance();
+
+        // (
+        matchType(TokenType.LEFT_PAREN);
+        node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+        this.advance();
+
+        // ATOMIC
+        node.addChild(parseAtomic());
+
+        // ,
+        matchType(TokenType.COMMA);
+        node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+        this.advance();
+
+        // ATOMIC
+        node.addChild(parseAtomic());
+
+        // ,
+        matchType(TokenType.COMMA);
+        node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+        this.advance();
+
+        // ATOMIC
+        node.addChild(parseAtomic());
+
+        // )
+        matchType(TokenType.RIGHT_PAREN);
         node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
         this.advance();
 
@@ -205,24 +413,42 @@ public class Parser {
     }
 
     private ParseNode parseCONST(){
-        ParseNode node = new ParseNode();
+        ParseNode node = new ParseNode("CONST");
 
-        if(this.current.type != TokenType.NUM && this.current.type != TokenType.TEXTLIT){
-            throw new RuntimeException(Errors.formatParserError(this.current, "NUM or TEXTLIT", currentLine));
-        }
+        matchTwoTypes(TokenType.NUM, TokenType.TEXTLIT);
         node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
         this.advance();
 
         return node;
     }
 
+    private ParseNode parseTerm(){
+        ParseNode node = new ParseNode("TERM");
+
+        switch (this.current.type){
+            case NUM, TEXTLIT -> {
+                node.addChild(parseCONST());
+                break;
+            }
+            case VNAME -> {
+                node.addChild(parseVNAME());
+                break;
+            }
+            case FNAME -> {
+                node.addChild(parseFNAMECALL());
+                break;
+            }
+            default -> node.addChild(parseCondition());
+        }
+
+        return node;
+    }
+
     private ParseNode parseIF(){
-        ParseNode node = new ParseNode();
+        ParseNode node = new ParseNode("BRANCH");
 
         // if
-        if (this.current.type != TokenType.IF) {
-            throw new RuntimeException(Errors.formatParserError(this.current, "if", currentLine));
-        }
+        matchType(TokenType.IF);
         node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
         this.advance();
 
@@ -230,9 +456,7 @@ public class Parser {
         node.addChild(parseCondition());
 
         // then
-        if (this.current.type != TokenType.THEN) {
-            throw new RuntimeException(Errors.formatParserError(this.current, "then", currentLine));
-        }
+        matchType(TokenType.THEN);
         node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
         this.advance();
 
@@ -250,30 +474,24 @@ public class Parser {
     }
 
     private ParseNode parseCondition(){
-        ParseNode node = new ParseNode();
+        ParseNode node = new ParseNode("COND");
 
-        // unop or binop
-        if(this.current.type == TokenType.NOT || this.current.type == TokenType.SQRT){
-            node = parseBinopSimpleBuilder(node);
-        }
-        else if(this.current.type == TokenType.OR || this.current.type == TokenType.AND || this.current.type == TokenType.EQ || this.current.type == TokenType.GT
-                || this.current.type == TokenType.ADD || this.current.type == TokenType.SUB || this.current.type == TokenType.MUL || this.current.type == TokenType.DIV){
-            node = parseBinopBuilder(node, true);
-        }
-        else{
-            throw new RuntimeException(Errors.formatParserError(this.current, "NOT, SQRT, OR, AND, EQ, GT, ADD, SUB, MUL, DIV", currentLine));
+        switch (this.current.type) {// unop or binop
+            case NOT, SQRT -> node = parseUnopBuilder();
+            case OR, AND, EQ, GT, ADD, SUB, MUL, DIV -> node = parseBinopBuilder(true);
+            default -> throw new RuntimeException(Errors.formatParserError(this.current, "NOT, SQRT, OR, AND, EQ, GT, ADD, SUB, MUL, DIV", currentLine));
         }
 
         return node;
     }
 
     private ParseNode parseBinop(Boolean recursive){
-        ParseNode node = new ParseNode();
+        ParseNode node = new ParseNode("BINOPCOMPOSITE");
 
         if((this.current.type == TokenType.OR || this.current.type == TokenType.AND || this.current.type == TokenType.EQ || this.current.type == TokenType.GT
                 || this.current.type == TokenType.ADD || this.current.type == TokenType.SUB || this.current.type == TokenType.MUL || this.current.type == TokenType.DIV)
                 && recursive){
-            node = parseBinopSimpleBuilder(node);
+            node = parseBinopBuilder(false);
         } else {
             node.addChild(parseAtomic());
         }
@@ -281,52 +499,59 @@ public class Parser {
         return node;
     }
 
-    private ParseNode parseBinopSimpleBuilder(ParseNode node){
+    private ParseNode parseUnopBuilder(){
+        ParseNode node = new ParseNode("UNOPCSIMPLE");
+
+        // expect unop
+        node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+        this.advance();
+
         // advance and expect (
-        this.advance();
-        if (this.current.type != TokenType.LEFT_PAREN) {
-            throw new RuntimeException(Errors.formatParserError(this.current, "(", currentLine));
-        }
+        matchType(TokenType.LEFT_PAREN);
         node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
-        node.addChild(parseBinopBuilder(new ParseNode(), false));
-        // advance and expect ,
         this.advance();
-        if (this.current.type != TokenType.COMMA) {
-            throw new RuntimeException(Errors.formatParserError(this.current, ",", currentLine));
-        }
-        node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
-        node.addChild(parseBinopBuilder(new ParseNode(), false));
+
+        if((this.current.type != TokenType.OR && this.current.type != TokenType.AND 
+        && this.current.type != TokenType.EQ && this.current.type != TokenType.GT
+        && this.current.type != TokenType.ADD && this.current.type != TokenType.SUB 
+        && this.current.type != TokenType.MUL && this.current.type != TokenType.DIV)){
+            throw new RuntimeException(Errors.formatParserError(this.current, "OR, AND, EQ, GT, ADD, SUB, MUL, DIV", currentLine));
+        } 
+        node.addChild(parseBinopBuilder(false));
+
         // advance and expect )
         this.advance();
-        if (this.current.type != TokenType.RIGHT_PAREN) {
-            throw new RuntimeException(Errors.formatParserError(this.current, ")", currentLine));
-        }
+        matchType(TokenType.RIGHT_PAREN);
         node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
 
         return node;
     }
 
-    private ParseNode parseBinopBuilder(ParseNode node, Boolean recursive){
+    private ParseNode parseBinopBuilder(Boolean recursive){
+        ParseNode node = new ParseNode("BINOPSIMPLE");
+        
+        // expect binop
+        node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+        this.advance();
+
         // advance and expect (
-        this.advance();
-        if (this.current.type != TokenType.LEFT_PAREN) {
-            throw new RuntimeException(Errors.formatParserError(this.current, "(", currentLine));
-        }
+        matchType(TokenType.LEFT_PAREN);
         node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+        this.advance();
+
         node.addChild(parseBinop(recursive));
+
         // advance and expect ,
-        this.advance();
-        if (this.current.type != TokenType.COMMA) {
-            throw new RuntimeException(Errors.formatParserError(this.current, ",", currentLine));
-        }
+        matchType(TokenType.COMMA);
         node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+        this.advance();
+
         node.addChild(parseBinop(recursive));
+
         // advance and expect )
-        this.advance();
-        if (this.current.type != TokenType.RIGHT_PAREN) {
-            throw new RuntimeException(Errors.formatParserError(this.current, ")", currentLine));
-        }
+        matchType(TokenType.RIGHT_PAREN);
         node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+        this.advance();
 
         return node;
     }

@@ -6,11 +6,13 @@ import java.util.List;
 public class ParseNode {
     public ParseType type;
     public Token token;
+    public String nonterminalname;
     public List<ParseNode> children;
 
-    public ParseNode() {
+    public ParseNode(String ntn) {
         this.token = null;
         this.type = ParseType.NONTERMINAL;
+        this.nonterminalname = ntn;
         this.children = new ArrayList<>();
     }
 
@@ -26,6 +28,10 @@ public class ParseNode {
     }
 
     public void addChild(ParseNode child) {
+        // check if child is null and discard if null
+        if(child == null){
+            return;
+        }
         this.children.add(child);
     }
 
@@ -38,6 +44,8 @@ public class ParseNode {
         StringBuilder sb = new StringBuilder();
         if(token != null) {
             sb.append(prefix).append(isTail ? "└── " : "├── ").append(token.toString()).append("\n");
+        } else {
+            sb.append(prefix).append(isTail ? "└── " : "├── ").append(this.nonterminalname).append("\n");
         }
         if (children != null) {
             for (int i = 0; i < children.size() - 1; i++) {

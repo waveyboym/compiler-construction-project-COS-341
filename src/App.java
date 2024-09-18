@@ -1,7 +1,8 @@
+import Interfaces.ParseNode;
 import Interfaces.Token;
 import Lexer.Lexer;
+import Parser.Parser;
 import Utils.FileManager;
-import Utils.XMLGenerator;
 import java.util.List;
 
 public class App {
@@ -28,9 +29,16 @@ public class App {
         try {
             Lexer lexer = new Lexer(contents, path);
             List<Token> tokens = lexer.scanTokens();
-            XMLGenerator xmlGenerator = new XMLGenerator(tokens);
-            String xml = xmlGenerator.generateXML();
-            FileManager.createAndWriteFile("out/output.xml", xml);
+
+            //XMLGenerator xmlGenerator = new XMLGenerator(tokens);
+            //String xml = xmlGenerator.generateXML();
+            //FileManager.createAndWriteFile("out/output.xml", xml);
+            
+            Parser parser = new Parser(tokens);
+            ParseNode pt = parser.parse();
+            System.out.println(pt.toString());
+
+            
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }

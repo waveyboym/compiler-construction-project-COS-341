@@ -12,17 +12,16 @@ public class Test {
     public static void main(String[] args) {
         System.out.println("Running tests...");
         //testTokenClass();
-        testLexerClass();
-        //testParseNodeClass();
+        //testLexerClass();
+        testParseNodeClass();
         System.out.println("Tests passed: " + testsPassed + "/" + totalTests);
         System.out.println("Tests failed: " + testsFailed + "/" + totalTests);
         System.out.println("Tests total: " + totalTests);
     }
 
     private static void testTokenClass(){
-        Token token = new Token(TokenType.INPUT, "test.txt", "1", 0, "test");
-        if(token.type == TokenType.INPUT && token.fileName.equals("test.txt") 
-        && token.Line.equals("1") && token.Column == 0 && token.Value.equals("test")){
+        Token token = new Token(TokenType.INPUT, "test.txt", 1, 0, "test");
+        if(token.type == TokenType.INPUT && token.fileName.equals("test.txt") && token.Line == 1 && token.Column == 0 && token.Value.equals("test")){
             System.out.println("[PASS] Token class test passed");
             testsPassed++;
         } else {
@@ -141,15 +140,15 @@ public class Test {
     }
 
     public static void testParseNodeClass(){
-        ParseNode node = new ParseNode(new Token(TokenType.INPUT, "test.txt", "1", 0, "test"), ParseType.TERMINAL);
-        ParseNode child1 = new ParseNode(new Token(TokenType.INPUT, "test.txt", "1", 0, "test"), ParseType.TERMINAL);
-        ParseNode child2 = new ParseNode(new Token(TokenType.INPUT, "test.txt", "1", 0, "test"), ParseType.TERMINAL);
+        ParseNode node = new ParseNode(new Token(TokenType.INPUT, "test.txt", 1, 0, "test"), ParseType.TERMINAL);
+        ParseNode child1 = new ParseNode(new Token(TokenType.INPUT, "test.txt", 1, 0, "test"), ParseType.TERMINAL);
+        ParseNode child2 = new ParseNode(new Token(TokenType.INPUT, "test.txt", 1, 0, "test"), ParseType.TERMINAL);
 
-        ParseNode child11 = new ParseNode(new Token(TokenType.INPUT, "test.txt", "1", 0, "test"), ParseType.TERMINAL);
-        ParseNode child12 = new ParseNode(new Token(TokenType.INPUT, "test.txt", "1", 0, "test"), ParseType.TERMINAL);
+        ParseNode child11 = new ParseNode(new Token(TokenType.INPUT, "test.txt", 1, 0, "test"), ParseType.TERMINAL);
+        ParseNode child12 = new ParseNode(new Token(TokenType.INPUT, "test.txt", 1, 0, "test"), ParseType.TERMINAL);
 
-        ParseNode child21 = new ParseNode(new Token(TokenType.INPUT, "test.txt", "1", 0, "test"), ParseType.TERMINAL);
-        ParseNode child22 = new ParseNode(new Token(TokenType.INPUT, "test.txt", "1", 0, "test"), ParseType.TERMINAL);
+        ParseNode child21 = new ParseNode(new Token(TokenType.INPUT, "test.txt", 1, 0, "test"), ParseType.TERMINAL);
+        ParseNode child22 = new ParseNode(new Token(TokenType.INPUT, "test.txt", 1, 0, "test"), ParseType.TERMINAL);
 
         child1.addChild(child11);
         child1.addChild(child12);

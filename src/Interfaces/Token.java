@@ -3,11 +3,11 @@ public class Token {
     public TokenType type;
     public String uuid;
     public String fileName;
-    public String Line;
+    public int Line;
     public int Column;
     public String Value;
 
-    public Token(TokenType type, String fileName, String Line, int Column, String Value) {
+    public Token(TokenType type, String fileName, int Line, int Column, String Value) {
         this.uuid = java.util.UUID.randomUUID().toString();
         this.type = type;
         this.fileName = fileName;

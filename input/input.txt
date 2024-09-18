@@ -1,5 +1,6 @@
-main
-num
-text
-skip halt not
-end
+main 
+    begin 
+        skip; 
+        halt; 
+        V_name;
+    end
