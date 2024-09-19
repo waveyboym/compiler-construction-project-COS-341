@@ -57,4 +57,21 @@ public class ParseNode {
         }
         return sb.toString();
     }
+
+    public String toXML(String prefix){
+        StringBuilder xml = new StringBuilder();
+        if(this.type == ParseType.TERMINAL){
+            xml.append(prefix).append("<").append(this.token.type).append(">\n")
+            .append(prefix).append(" <ID>").append(this.token.uuid).append("</ID>\n")
+            .append(prefix).append(" <VALUE>").append(this.token.Value).append("</VALUE>\n")
+            .append(prefix).append("</").append(this.token.type).append(">");
+        } else {
+            xml.append(prefix).append("<").append(this.nonterminalname).append(">\n");
+            for(ParseNode child : this.children){
+                xml.append(child.toXML(prefix + "  ")).append("\n");
+            }
+            xml.append(prefix).append("</").append(this.nonterminalname).append(">\n");
+        }
+        return xml.toString();
+    }
 }

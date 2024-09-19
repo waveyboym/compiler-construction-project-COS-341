@@ -3,6 +3,7 @@ import Interfaces.Token;
 import Lexer.Lexer;
 import Parser.Parser;
 import Utils.FileManager;
+import Utils.XMLGenerator;
 import java.util.List;
 
 public class App {
@@ -30,15 +31,14 @@ public class App {
             Lexer lexer = new Lexer(contents, path);
             List<Token> tokens = lexer.scanTokens();
 
-            //XMLGenerator xmlGenerator = new XMLGenerator(tokens);
-            //String xml = xmlGenerator.generateXML();
-            //FileManager.createAndWriteFile("out/output.xml", xml);
+            String xmllex = XMLGenerator.generateLEXERXML(tokens);
+            FileManager.createAndWriteFile("out/lexer.xml", xmllex);
             
             Parser parser = new Parser(tokens);
             ParseNode pt = parser.parse();
-            System.out.println(pt.toString());
-
             
+            String xmlparse = XMLGenerator.generatePARSERXML(pt);
+            FileManager.createAndWriteFile("out/parser.xml", xmlparse);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }

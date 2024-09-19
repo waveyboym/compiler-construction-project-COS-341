@@ -1,17 +1,11 @@
 package Utils;
-import java.util.List;
-
+import Interfaces.ParseNode;
 import Interfaces.Token;
 import Interfaces.TokenType;
+import java.util.List;
 
 public class XMLGenerator {
-    private final List<Token> tokens;
-
-    public XMLGenerator(List<Token> tokens) {
-        this.tokens = tokens;
-    }
-
-    public String generateXML() {
+    public static String generateLEXERXML(List<Token> tokens) {
         StringBuilder xml = new StringBuilder();
         xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
         xml.append("<TOKENSTREAM>\n");
@@ -26,6 +20,15 @@ public class XMLGenerator {
             xml.append("  </TOK>\n");
         }
         xml.append("</TOKENSTREAM>\n");
+        return xml.toString();
+    }
+
+    public static String generatePARSERXML(ParseNode parseTree) {
+        StringBuilder xml = new StringBuilder();
+        xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+        xml.append("<PARSETREE>\n");
+        xml.append(parseTree.toXML(" "));
+        xml.append("</PARSETREE>\n");
         return xml.toString();
     }
 }

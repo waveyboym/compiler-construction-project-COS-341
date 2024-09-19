@@ -2,5 +2,5 @@ main
     begin 
         skip; 
         halt; 
-        V_name;
+        skip;
     end
