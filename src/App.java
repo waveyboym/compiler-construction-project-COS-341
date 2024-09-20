@@ -7,19 +7,13 @@ import Utils.XMLGenerator;
 import java.util.List;
 
 public class App {
-
-    public static void printTokens(List<Token> tokens) {
-        for (Token token : tokens) {
-            System.out.println(token);
-        }
-    }
     public static void main(String[] args) throws Exception {
         // receive file path from command line arguments
         // example: java App src/test.txt
         String path;
 
         if (args.length != 1) {
-            path = "input/input.txt";
+            path = "input/main.spl";
         } else {
             path = args[0];
         }
@@ -39,6 +33,8 @@ public class App {
             
             String xmlparse = XMLGenerator.generatePARSERXML(pt);
             FileManager.createAndWriteFile("out/parser.xml", xmlparse);
+
+            System.out.println(pt.toString());
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }

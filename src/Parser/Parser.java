@@ -176,6 +176,10 @@ public class Parser {
 
         // match 3 vnames
         // vname 1
+        matchTwoTypes(TokenType.NUM, TokenType.VTEXT);
+        node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+        this.advance();
+        
         matchType(TokenType.VNAME);
         node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
         this.advance();
@@ -186,6 +190,10 @@ public class Parser {
         this.advance();
 
         // vname 2
+        matchTwoTypes(TokenType.NUM, TokenType.VTEXT);
+        node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+        this.advance();
+
         matchType(TokenType.VNAME);
         node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
         this.advance();
@@ -196,6 +204,10 @@ public class Parser {
         this.advance();
 
         // vname 3
+        matchTwoTypes(TokenType.NUM, TokenType.VTEXT);
+        node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+        this.advance();
+
         matchType(TokenType.VNAME);
         node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
         this.advance();
@@ -254,9 +266,15 @@ public class Parser {
         this.advance();
 
         // if "," then parse LocalVars else return node
-        if (this.current.type == TokenType.COMMA && levels > 0) {
+        if (this.current.type == TokenType.COMMA && levels > 1) {
+            node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
             this.advance();
             node.addChild(parseLocalVars(levels - 1));
+        } else{
+            // capture final ","
+            matchType(TokenType.COMMA);
+            node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+            this.advance();
         }
 
         return node;

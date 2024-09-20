@@ -3,4 +3,5 @@ main
         skip; 
         halt; 
         skip;
+        print V_sum;
     end
