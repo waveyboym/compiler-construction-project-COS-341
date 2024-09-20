@@ -1,7 +1,5 @@
 main 
+    num V_sum
     begin 
-        skip; 
-        halt; 
-        skip;
-        print V_sum;
+        V_sum = F_compute(V_x, V_y, V_z);
     end
