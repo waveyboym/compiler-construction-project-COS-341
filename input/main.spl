@@ -1,5 +1,7 @@
 main 
     num V_sum
     begin 
-        V_sum = F_compute(V_x, V_y, V_z);
+        if not(and(5, 5))
+        then begin end
+        else begin end
     end

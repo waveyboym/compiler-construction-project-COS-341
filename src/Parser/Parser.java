@@ -55,13 +55,13 @@ public class Parser {
 
     private void matchType(TokenType type){
         if(this.current.type != type){
-            throw new RuntimeException(Errors.formatParserError(this.current, type.toString(), currentLine));
+            throw new RuntimeException(Errors.formatParserError(this.current, Errors.stringRepresentation(type), currentLine));
         }
     }
 
     private void matchTwoTypes(TokenType type1, TokenType type2){
         if(this.current.type != type1 && this.current.type != type2){
-            throw new RuntimeException(Errors.formatParserError(this.current, type1.toString() + " or " + type2.toString(), currentLine));
+            throw new RuntimeException(Errors.formatParserError(this.current, Errors.stringRepresentation(type1) + " or " + Errors.stringRepresentation(type2), currentLine));
         }
     }
 
@@ -433,7 +433,7 @@ public class Parser {
     private ParseNode parseCONST(){
         ParseNode node = new ParseNode("CONST");
 
-        matchTwoTypes(TokenType.NUM, TokenType.TEXTLIT);
+        matchTwoTypes(TokenType.NUMLIT, TokenType.TEXTLIT);
         node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
         this.advance();
 
@@ -504,7 +504,7 @@ public class Parser {
     }
 
     private ParseNode parseBinop(Boolean recursive){
-        ParseNode node = new ParseNode("BINOPCOMPOSITE");
+        ParseNode node = new ParseNode("BINOPSIMPLE");
 
         if((this.current.type == TokenType.OR || this.current.type == TokenType.AND || this.current.type == TokenType.EQ || this.current.type == TokenType.GT
                 || this.current.type == TokenType.ADD || this.current.type == TokenType.SUB || this.current.type == TokenType.MUL || this.current.type == TokenType.DIV)
@@ -538,15 +538,15 @@ public class Parser {
         node.addChild(parseBinopBuilder(false));
 
         // advance and expect )
-        this.advance();
         matchType(TokenType.RIGHT_PAREN);
         node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+        this.advance();
 
         return node;
     }
 
     private ParseNode parseBinopBuilder(Boolean recursive){
-        ParseNode node = new ParseNode("BINOPSIMPLE");
+        ParseNode node = new ParseNode("BINOPCOMPOSITE");
         
         // expect binop
         node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
