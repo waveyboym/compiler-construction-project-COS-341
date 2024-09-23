@@ -43,8 +43,14 @@ public class Parser {
                     this.currentLine += this.current.Value;
                 }
             }
+
+            if(this.current.type == TokenType.NULLTYPE){
+                this.current = new Token(TokenType.EOF, this.current.fileName, this.current.Line, this.current.Column, "EOF");
+            }
+
             return this.current;
         } else if( this.current.type == TokenType.END){
+            this.current = new Token(TokenType.EOF, this.current.fileName, this.current.Line, this.current.Column, "EOF");
             return this.current;
         }
         else {
@@ -138,7 +144,7 @@ public class Parser {
     private ParseNode parseFUNCTIONS(){
         ParseNode node = new ParseNode("FUNCTIONS");
 
-        if(this.current.type == TokenType.END){
+        if(this.current.type == TokenType.END || this.current.type == TokenType.EOF){
             return null;
         }
 
