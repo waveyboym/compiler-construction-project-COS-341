@@ -42,4 +42,14 @@ public class FileManager {
             System.out.println("An error occurred.");
         }
     }
+
+    public static void writeBasicCode(String path, String contents) {
+        try {
+            try (java.io.FileWriter writer = new java.io.FileWriter(path)) {
+                writer.write(contents);
+            }
+        } catch (IOException e) {
+            System.out.println("An error occurred.");
+        }
+    }
 }

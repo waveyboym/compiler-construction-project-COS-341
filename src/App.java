@@ -1,9 +1,9 @@
+import CodeGenBasic.CodeGenBasic;
 import Interfaces.ParseNode;
 import Interfaces.Token;
 import Lexer.Lexer;
 import Parser.Parser;
 import Utils.FileManager;
-import Utils.XMLGenerator;
 import java.util.List;
 
 public class App {
@@ -25,16 +25,17 @@ public class App {
             Lexer lexer = new Lexer(contents, path);
             List<Token> tokens = lexer.scanTokens();
 
-            String xmllex = XMLGenerator.generateLEXERXML(tokens);
-            FileManager.createAndWriteFile("out/lexer.xml", xmllex);
+            //String xmllex = XMLGenerator.generateLEXERXML(tokens);
+            //FileManager.createAndWriteFile("out/lexer.xml", xmllex);
             
             Parser parser = new Parser(tokens);
             ParseNode pt = parser.parse();
             
-            String xmlparse = XMLGenerator.generatePARSERXML(pt);
-            FileManager.createAndWriteFile("out/parser.xml", xmlparse);
+            //String xmlparse = XMLGenerator.generatePARSERXML(pt);
+            //FileManager.createAndWriteFile("out/parser.xml", xmlparse);
 
-            System.out.println(pt.toString());
+            CodeGenBasic cgb = new CodeGenBasic(pt);
+            FileManager.writeBasicCode("out/basic.bas", cgb.generateCode());
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }

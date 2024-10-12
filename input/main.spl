@@ -1,7 +1,9 @@
 main 
-    num V_sum
+    num V_sum, text V_value
     begin 
-        if not(and(5, 5))
-        then begin end
-        else begin end           
+        print V_sum;
+        print "Hello";
+        skip;
+        skip;
+        print V_value;        
     end
