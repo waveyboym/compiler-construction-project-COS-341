@@ -450,7 +450,7 @@ public class Parser {
         ParseNode node = new ParseNode("TERM");
 
         switch (this.current.type){
-            case NUM, TEXTLIT -> {
+            case NUMLIT, TEXTLIT -> {
                 node.addChild(parseCONST());
                 break;
             }

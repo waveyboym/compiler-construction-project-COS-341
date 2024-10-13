@@ -5,5 +5,9 @@ main
         print "Hello";
         skip;
         skip;
-        print V_value;        
+        print V_value; 
+        V_value = "Helloworld";    
+        print V_value; 
+        V_value < input;   
+        print V_value; 
     end

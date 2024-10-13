@@ -31,7 +31,8 @@ public class CodeGenBasic {
         ParseNode ALGO = pt.children.get(2);
         sb.append(generateBasicAlgo(ALGO));
 
-        return sb.toString();
+        // remove final "\n" which is the last character in the string
+        return sb.toString().substring(0, sb.length() - 1);
     }
 
     private String generateBasicGlobalVariables(ParseNode gbvars){
@@ -64,7 +65,7 @@ public class CodeGenBasic {
     private String generateBasicAlgo(ParseNode algo){
         // expected: ALGO := begin INSTRUC end
         // ignore begin and end
-        return generateBasicInstruc(algo.children.get(1));
+        return generateBasicInstruc(algo.children.get(1)) + Line() + " END\n";
     }
 
     private String generateBasicInstruc(ParseNode instruc){
@@ -90,7 +91,7 @@ public class CodeGenBasic {
         // skip: LN GOTO LN+10
         // halt: LN END
         // print ATOMIC: LN PRINT ATOMIC
-        // ASSIGN: LN LET VNAME = EXPR
+        // ASSIGN: LN VNAME = EXPR
         // CALL: LN CALL FNAME
         // BRANCH: LN IF EXPR THEN GOTO LN+10
 
@@ -108,7 +109,18 @@ public class CodeGenBasic {
                 default -> throw new IllegalArgumentException("Unexpected value: " + command.children.get(0).token.type);
             }
         }else{
-
+            switch(command.children.get(0).nonterminalname){
+                case "ASSIGN" -> {
+                    sb.append(generateBasicAssign(command.children.get(0)));
+                }
+                case "CALL" -> {
+                    sb.append(generateBasicCall(command.children.get(0)));
+                }
+                case "BRANCH" -> {
+                    sb.append(generateBasicBranch(command.children.get(0)));
+                }
+                default -> throw new IllegalArgumentException("Unexpected value: " + command.children.get(0).nonterminalname);
+            }
         }
 
         return sb.toString();
@@ -121,6 +133,74 @@ public class CodeGenBasic {
         }else{
             return geneareBasicConst(atomic.children.get(0));
         }
+    }
+
+    private String generateBasicAssign(ParseNode assign){
+        // expected: ASSIGN := VNAME = EXPR
+        // equivalent BASIC syntax code: LN VNAME = EXPR
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(Line()).append(" ");
+        if(assign.children.get(1).token.type == TokenType.LESS_THAN_SIGN){
+            // we are receiving input from user
+            sb.append("INPUT ");
+            sb.append(generateBasicVname(assign.children.get(0)));
+            sb.append("\n");
+        } else {
+            sb.append(generateBasicVname(assign.children.get(0)));
+            sb.append(" = ");
+            sb.append(generateBasicExpr(assign.children.get(2)));
+            sb.append("\n");
+        }
+
+        return sb.toString();
+    }
+
+    private String generateBasicExpr(ParseNode expr){
+        // expected: EXPR := ATOMIC | FNAME ( ATOMIC, ATMOIC, ATOMIC )
+        if(expr.children.get(0).nonterminalname.equals("CONST")){
+            return generateBasicAtomic(expr);
+        }else{
+            StringBuilder sb = new StringBuilder();
+
+            sb.append("CALL ");
+            sb.append(expr.children.get(0).token.Value);
+            sb.append("(");
+            sb.append(generateBasicAtomic(expr.children.get(2)));
+            sb.append(", ");
+            sb.append(generateBasicAtomic(expr.children.get(4)));
+            sb.append(", ");
+            sb.append(generateBasicAtomic(expr.children.get(6)));
+            sb.append(")");
+
+            return sb.toString();
+        }
+    }
+
+    private String generateBasicCall(ParseNode call){
+        // expected: CALL := FNAME
+        // equivalent BASIC syntax code: LN CALL FNAME(arg1, arg2, ...)
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(Line()).append(" CALL ");
+        sb.append(call.children.get(0).token.Value);
+        sb.append("\n");
+
+        return sb.toString();
+    }
+
+    private String generateBasicBranch(ParseNode branch){
+        // expected: BRANCH := if EXPR then INSTRUC else INSTRUC
+        // equivalent BASIC syntax code: LN IF EXPR THEN GOTO LN+10
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(Line()).append(" IF ");
+        sb.append(generateBasicExpr(branch.children.get(1)));
+        sb.append(" THEN GOTO ");
+        sb.append(this.line + 10);
+        sb.append("\n");
+
+        return sb.toString();
     }
 
     private String generateBasicVname(ParseNode vname){
