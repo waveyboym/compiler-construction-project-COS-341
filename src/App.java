@@ -1,8 +1,10 @@
 import Interfaces.ParseNode;
+import Interfaces.SyntaxTreeNode;
 import Interfaces.Token;
 import Lexer.Lexer;
 import Parser.Parser;
 import Utils.FileManager;
+import Utils.SyntaxTreeParser;
 import Utils.XMLGenerator;
 import java.util.List;
 
@@ -35,6 +37,11 @@ public class App {
             FileManager.createAndWriteFile("out/parser.xml", xmlparse);
 
             System.out.println(pt.toString());
+
+            SyntaxTreeParser stp = new SyntaxTreeParser();
+            SyntaxTreeNode st = stp.parse("out/parser.xml");
+            
+            System.out.println(st.toString());
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }

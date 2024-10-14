@@ -1,76 +1,42 @@
-import Interfaces.*;
+package Utils;
+
+import org.w3c.dom.*;
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
+import Interfaces.TokenType;
+import Interfaces.SyntaxTreeNode;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import org.w3c.dom.*;
 
 public class SyntaxTreeParser {
-
     public SyntaxTreeNode parse(String xmlFilePath) {
         try {
             // Initialize XML parser
-            DocumentBuilderFactory factory =
-                DocumentBuilderFactory.newInstance();
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
+
             Document doc = builder.parse(new File(xmlFilePath));
             doc.getDocumentElement().normalize();
 
-            // Parse the root element
+            // Get the root element (PARSETREE)
             Element rootElement = doc.getDocumentElement();
 
-            if (!rootElement.getTagName().equals("SYNTREE")) {
+            if (!rootElement.getTagName().equals("PARSETREE")) {
                 throw new Exception("Invalid syntax tree XML file.");
             }
 
-            // Parse ROOT node
-            Element rootNodeElement = (Element) rootElement
-                .getElementsByTagName("ROOT")
-                .item(0);
-            SyntaxTreeNode rootNode = parseInnerNode(rootNodeElement);
+            // Parse the PROG element
+            NodeList childNodes = rootElement.getChildNodes();
 
-            // Build a map of ID to nodes
-            Map<String, SyntaxTreeNode> nodeMap = new HashMap<>();
-            nodeMap.put(rootNode.id, rootNode);
+            for (int i = 0; i < childNodes.getLength(); i++) {
+                Node node = childNodes.item(i);
 
-            // Parse INNERNODES
-            NodeList innerNodes = rootElement.getElementsByTagName("IN");
+                if (node.getNodeType() == Node.ELEMENT_NODE) {
+                    Element progElement = (Element) node;
 
-            for (int i = 0; i < innerNodes.getLength(); i++) {
-                Element innerNodeElement = (Element) innerNodes.item(i);
-                InnerNode innerNode = parseInnerNode(innerNodeElement);
-                nodeMap.put(innerNode.id, innerNode);
-            }
-
-            // Parse LEAFNODES
-            NodeList leafNodes = rootElement.getElementsByTagName("LEAF");
-
-            for (int i = 0; i < leafNodes.getLength(); i++) {
-                Element leafNodeElement = (Element) leafNodes.item(i);
-                LeafNode leafNode = parseLeafNode(leafNodeElement);
-                nodeMap.put(leafNode.id, leafNode);
-            }
-
-            // Build the tree by connecting parent and children
-            for (SyntaxTreeNode node : nodeMap.values()) {
-                if (node instanceof InnerNode) {
-                    InnerNode innerNode = (InnerNode) node;
-                    Element element = findElementById(doc, innerNode.id);
-                    NodeList childIds =
-                        ((Element) element
-                                .getElementsByTagName("CHILDREN")
-                                .item(0)).getElementsByTagName("ID");
-
-                    for (int i = 0; i < childIds.getLength(); i++) {
-                        String childId = childIds.item(i).getTextContent();
-                        SyntaxTreeNode childNode = nodeMap.get(childId);
-                        innerNode.addChild(childNode);
-                    }
+                    return parseNode(progElement);
                 }
             }
-
-            return rootNode;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -78,65 +44,41 @@ public class SyntaxTreeParser {
         return null;
     }
 
-    private InnerNode parseInnerNode(Element element) {
-        String id = element
-            .getElementsByTagName("UNID")
-            .item(0)
-            .getTextContent();
-        TokenType symbol = TokenType.valueOf(
-            element.getElementsByTagName("SYMB").item(0).getTextContent()
-        );
-        return new InnerNode(id, symbol);
-    }
+    private SyntaxTreeNode parseNode(Element element) {
+        TokenType symbol = TokenType.valueOf(element.getTagName());
+        SyntaxTreeNode treeNode = new SyntaxTreeNode(symbol);
 
-    private LeafNode parseLeafNode(Element element) {
-        String id = element
-            .getElementsByTagName("UNID")
-            .item(0)
-            .getTextContent();
-        Element terminalElement = (Element) element
-            .getElementsByTagName("TERMINAL")
-            .item(0);
+        boolean hasChildren = false;
+        NodeList childNodes = element.getChildNodes();
 
-        // Parse token from TERMINAL element
-        String tokenId = terminalElement
-            .getElementsByTagName("ID")
-            .item(0)
-            .getTextContent();
-        TokenType type = TokenType.valueOf(
-            terminalElement
-                .getElementsByTagName("CLASS")
-                .item(0)
-                .getTextContent()
-        );
-        String word = terminalElement
-            .getElementsByTagName("WORD")
-            .item(0)
-            .getTextContent();
+        for (int i = 0; i < childNodes.getLength(); i++) {
+            Node node = childNodes.item(i);
 
-        SyntaxToken token = new SyntaxToken(tokenId, type, word);
-        return new LeafNode(id, token);
-    }
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                hasChildren = true;
 
-    private Element findElementById(Document doc, String id) {
-        NodeList nodes = doc.getElementsByTagName("*");
+                Element childElement = (Element) node;
+                String childTag = childElement.getTagName();
 
-        for (int i = 0; i < nodes.getLength(); i++) {
-            Node node = nodes.item(i);
-
-            if (node instanceof Element) {
-                Element element = (Element) node;
-
-                if (element.getElementsByTagName("UNID").getLength() > 0) {
-                    String nodeId = element
-                        .getElementsByTagName("UNID")
-                        .item(0)
-                        .getTextContent();
-                    if (nodeId == id) return element;
+                if (childTag.equals("ID")) {
+                    String id = childElement.getTextContent();
+                    treeNode.id = id;
+                } else if (childTag.equals("VALUE")) {
+                    String value = childElement.getTextContent();
+                    treeNode.value = value;
+                } else {
+                    // Recursive call for other elements
+                    SyntaxTreeNode childTreeNode = parseNode(childElement);
+                    treeNode.addChild(childTreeNode);
                 }
             }
         }
 
-        return null;
+        // Handle text nodes (e.g., whitespace)
+        if (!hasChildren && element.getTextContent() != null && !element.getTextContent().trim().isEmpty()) {
+            treeNode.value = element.getTextContent().trim();
+        }
+
+        return treeNode;
     }
 }

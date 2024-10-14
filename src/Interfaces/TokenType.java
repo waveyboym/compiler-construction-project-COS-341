@@ -24,6 +24,9 @@ public enum TokenType {
     BEGIN, END, IF, THEN, ELSE, SKIP, HALT, PRINT, 
     INPUT, MAIN, RETURN,
 
+    // Lexer tags
+    PROG, PARSETREE, GLOBVARS, ALGO, INSTRUC, COMMAND, BRANCH, VALUE, ID, CONST, ATOMIC, BINOPSIMPLE, BINOPCOMPOSITE, UNOPCSIMPLE,
+
     // Null, this token will be discarded in the lexing phase
     NULLTYPE,
 

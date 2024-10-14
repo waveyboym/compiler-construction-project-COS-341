@@ -1,102 +1,107 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TOKENSTREAM>
   <TOK>
-    <ID>fd115bb3-bbeb-4d02-bf05-71a006bba158</ID>
+    <ID>02e1c93f-373c-44e8-b9b8-0e03c5435155</ID>
     <CLASS>MAIN</CLASS>
     <WORD>main</WORD>
   </TOK>
   <TOK>
-    <ID>da7a5253-fd46-44c6-9d22-f9f18806dc9c</ID>
+    <ID>e6696219-6cb3-4d31-86d5-ea12976f70b5</ID>
     <CLASS>NUM</CLASS>
     <WORD>num</WORD>
   </TOK>
   <TOK>
-    <ID>1cf6a930-987e-4b03-ab8f-90f4fb0af63b</ID>
+    <ID>cb8bcba6-41d2-405a-8dc5-e43ac178d11d</ID>
     <CLASS>VNAME</CLASS>
     <WORD>V_sum</WORD>
   </TOK>
   <TOK>
-    <ID>81a2edfd-d558-4be6-90c2-c579466a9e67</ID>
+    <ID>e6696788-77e8-445c-af6a-884e108e1303</ID>
     <CLASS>BEGIN</CLASS>
     <WORD>begin</WORD>
   </TOK>
   <TOK>
-    <ID>bbe72c1c-304d-4814-8722-589c2d781f9c</ID>
+    <ID>80755ec9-18f7-439c-b8a2-b7e1b684283f</ID>
     <CLASS>IF</CLASS>
     <WORD>if</WORD>
   </TOK>
   <TOK>
-    <ID>9e7020c3-6df4-4002-b356-6ab13a8ddcdf</ID>
+    <ID>674e41b2-92fc-4bb7-bb68-b53045239e76</ID>
     <CLASS>NOT</CLASS>
     <WORD>not</WORD>
   </TOK>
   <TOK>
-    <ID>16ab4f28-1435-4e48-a48c-cbf6e46a44ed</ID>
+    <ID>d0cb6c3b-f93d-4bc2-8d95-52a8ecd532c0</ID>
     <CLASS>LEFT_PAREN</CLASS>
     <WORD>(</WORD>
   </TOK>
   <TOK>
-    <ID>c13b26f0-c436-41d6-ad8f-6c050cc55ed0</ID>
+    <ID>5e6adbfe-7d87-4e84-a1a8-2e033bc9b720</ID>
     <CLASS>AND</CLASS>
     <WORD>and</WORD>
   </TOK>
   <TOK>
-    <ID>f49c6eb8-d474-4280-8251-037c448d2aff</ID>
+    <ID>7b7f1fd7-469a-46cb-8617-76dd3e8b9260</ID>
     <CLASS>LEFT_PAREN</CLASS>
     <WORD>(</WORD>
   </TOK>
   <TOK>
-    <ID>50d6101d-daf8-4113-8f57-dea29d4106cc</ID>
+    <ID>2eaaa17d-4f61-4222-a3f9-f0d4369c3967</ID>
     <CLASS>NUMLIT</CLASS>
     <WORD>5</WORD>
   </TOK>
   <TOK>
-    <ID>71b20152-e20a-4498-b4da-0332c7ac2eae</ID>
+    <ID>3391cccf-8372-4f70-b5f6-d2d432bab367</ID>
     <CLASS>COMMA</CLASS>
     <WORD>,</WORD>
   </TOK>
   <TOK>
-    <ID>d80533e6-1e2d-4e51-90e6-bac90cec5d4f</ID>
+    <ID>057433a0-8663-42f6-a4ef-486ba4cc0767</ID>
     <CLASS>NUMLIT</CLASS>
     <WORD>5</WORD>
   </TOK>
   <TOK>
-    <ID>560666c0-62ad-471b-b7a7-fe72a2510cd7</ID>
+    <ID>c6a88671-cf26-47ea-8f28-3df03576280a</ID>
     <CLASS>RIGHT_PAREN</CLASS>
     <WORD>)</WORD>
   </TOK>
   <TOK>
-    <ID>ad7379fc-58a1-46d4-8d98-70cf64246e02</ID>
+    <ID>60174d82-2ee2-4019-a388-9127226f91cb</ID>
     <CLASS>RIGHT_PAREN</CLASS>
     <WORD>)</WORD>
   </TOK>
   <TOK>
-    <ID>7795dd2c-e415-4f5a-b6cb-752544e7ef03</ID>
+    <ID>e38568d4-1420-4104-9045-326e14830b5f</ID>
     <CLASS>THEN</CLASS>
     <WORD>then</WORD>
   </TOK>
   <TOK>
-    <ID>f7e42dc1-68e9-4d39-9ec8-8c511ba0749b</ID>
+    <ID>72f16975-5188-44a8-bcd5-0015e57e40ba</ID>
     <CLASS>BEGIN</CLASS>
     <WORD>begin</WORD>
   </TOK>
   <TOK>
-    <ID>b6b9a916-8cef-4412-9573-78aa9e637ff4</ID>
+    <ID>d5ee9c86-573f-48a9-a91a-ae28976b18f2</ID>
     <CLASS>END</CLASS>
     <WORD>end</WORD>
   </TOK>
   <TOK>
-    <ID>09405b6e-153f-46ab-88a8-b8834bf29ca9</ID>
+    <ID>4d16db64-72ba-42a4-94ec-2cdf59634a5f</ID>
     <CLASS>ELSE</CLASS>
     <WORD>else</WORD>
   </TOK>
   <TOK>
-    <ID>3f0ee91b-b733-496c-972a-5bc9a4d007a3</ID>
+    <ID>b9dff919-cde4-4a2c-8ab5-fcc2befcc08e</ID>
     <CLASS>BEGIN</CLASS>
     <WORD>begin</WORD>
   </TOK>
   <TOK>
-    <ID>302a8263-87d4-4a12-9d37-b16008037b0c</ID>
+    <ID>782fd93b-3c9a-4c52-9798-65f59f5e8a97</ID>
+    <CLASS>END</CLASS>
+    <WORD>end</WORD>
+  </TOK>
+  <TOK>
+    <ID>cb53907f-9b7d-4772-b2b9-96b9d7ff0ecc</ID>
     <CLASS>END</CLASS>
     <WORD>end</WORD>
   </TOK>
