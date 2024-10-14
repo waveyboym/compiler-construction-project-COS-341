@@ -1,18 +1,18 @@
-package Utils;
-
 import Interfaces.*;
 import java.io.File;
-import java.util.Map;
-import org.w3c.dom.*;
 import java.util.HashMap;
+import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import org.w3c.dom.*;
 
 public class SyntaxTreeParser {
+
     public SyntaxTreeNode parse(String xmlFilePath) {
         try {
             // Initialize XML parser
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilderFactory factory =
+                DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document doc = builder.parse(new File(xmlFilePath));
             doc.getDocumentElement().normalize();
@@ -25,7 +25,9 @@ public class SyntaxTreeParser {
             }
 
             // Parse ROOT node
-            Element rootNodeElement = (Element) rootElement.getElementsByTagName("ROOT").item(0);
+            Element rootNodeElement = (Element) rootElement
+                .getElementsByTagName("ROOT")
+                .item(0);
             SyntaxTreeNode rootNode = parseInnerNode(rootNodeElement);
 
             // Build a map of ID to nodes
@@ -55,8 +57,11 @@ public class SyntaxTreeParser {
                 if (node instanceof InnerNode) {
                     InnerNode innerNode = (InnerNode) node;
                     Element element = findElementById(doc, innerNode.id);
-                    NodeList childIds = ((Element) element.getElementsByTagName("CHILDREN").item(0)).getElementsByTagName("ID");
-                    
+                    NodeList childIds =
+                        ((Element) element
+                                .getElementsByTagName("CHILDREN")
+                                .item(0)).getElementsByTagName("ID");
+
                     for (int i = 0; i < childIds.getLength(); i++) {
                         String childId = childIds.item(i).getTextContent();
                         SyntaxTreeNode childNode = nodeMap.get(childId);
@@ -66,7 +71,6 @@ public class SyntaxTreeParser {
             }
 
             return rootNode;
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -75,19 +79,40 @@ public class SyntaxTreeParser {
     }
 
     private InnerNode parseInnerNode(Element element) {
-        String id = element.getElementsByTagName("UNID").item(0).getTextContent();
-        TokenType symbol = TokenType.valueOf(element.getElementsByTagName("SYMB").item(0).getTextContent());
+        String id = element
+            .getElementsByTagName("UNID")
+            .item(0)
+            .getTextContent();
+        TokenType symbol = TokenType.valueOf(
+            element.getElementsByTagName("SYMB").item(0).getTextContent()
+        );
         return new InnerNode(id, symbol);
     }
 
     private LeafNode parseLeafNode(Element element) {
-        String id = element.getElementsByTagName("UNID").item(0).getTextContent();
-        Element terminalElement = (Element) element.getElementsByTagName("TERMINAL").item(0);
+        String id = element
+            .getElementsByTagName("UNID")
+            .item(0)
+            .getTextContent();
+        Element terminalElement = (Element) element
+            .getElementsByTagName("TERMINAL")
+            .item(0);
 
         // Parse token from TERMINAL element
-        String tokenId = terminalElement.getElementsByTagName("ID").item(0).getTextContent();
-        TokenType type = TokenType.valueOf(terminalElement.getElementsByTagName("CLASS").item(0).getTextContent());
-        String word = terminalElement.getElementsByTagName("WORD").item(0).getTextContent();
+        String tokenId = terminalElement
+            .getElementsByTagName("ID")
+            .item(0)
+            .getTextContent();
+        TokenType type = TokenType.valueOf(
+            terminalElement
+                .getElementsByTagName("CLASS")
+                .item(0)
+                .getTextContent()
+        );
+        String word = terminalElement
+            .getElementsByTagName("WORD")
+            .item(0)
+            .getTextContent();
 
         SyntaxToken token = new SyntaxToken(tokenId, type, word);
         return new LeafNode(id, token);
@@ -103,7 +128,10 @@ public class SyntaxTreeParser {
                 Element element = (Element) node;
 
                 if (element.getElementsByTagName("UNID").getLength() > 0) {
-                    String nodeId = element.getElementsByTagName("UNID").item(0).getTextContent();
+                    String nodeId = element
+                        .getElementsByTagName("UNID")
+                        .item(0)
+                        .getTextContent();
                     if (nodeId == id) return element;
                 }
             }
