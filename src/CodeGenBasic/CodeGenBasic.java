@@ -118,7 +118,7 @@ public class CodeGenBasic {
                 case "ASSIGN" -> {
                     sb.append(generateBasicAssign(command.children.get(0)));
                 }
-                case "FNAME" -> {
+                case "CALL" -> {
                     sb.append(generateBasicCall(command.children.get(0)));
                 }
                 case "BRANCH" -> {
@@ -133,10 +133,10 @@ public class CodeGenBasic {
 
     private String generateBasicAtomic(ParseNode atomic){
         // expected: ATOMIC := VNAME | CONST
-        if(atomic.children.get(0).nonterminalname.equals("VNAME")){
-            return generateBasicVname(atomic.children.get(0));
+        if(atomic.children.get(0).token.type == TokenType.VNAME){
+            return generateBasicVname(atomic);
         }else{
-            return geneareBasicConst(atomic.children.get(0));
+            return geneareBasicConst(atomic);
         }
     }
 
@@ -149,10 +149,10 @@ public class CodeGenBasic {
         if(assign.children.get(1).token.type == TokenType.LESS_THAN_SIGN){
             // we are receiving input from user
             sb.append("INPUT ");
-            sb.append(generateBasicVname(assign.children.get(0)));
+            sb.append(generateBasicVname(assign));
             sb.append("\n");
         } else {
-            sb.append(generateBasicVname(assign.children.get(0)));
+            sb.append(generateBasicVname(assign));
             sb.append(" = ");
             sb.append(generateBasicExpr(assign.children.get(2)));
             sb.append("\n");
@@ -163,11 +163,11 @@ public class CodeGenBasic {
 
     private String generateBasicExpr(ParseNode expr){
         // expected: EXPR := ATOMIC | FNAME ( ATOMIC, ATMOIC, ATOMIC ) | OP
+        if(expr.children.get(0).token != null){
+            return generateBasicAtomic(expr);
+        }
         switch (expr.children.get(0).nonterminalname) {
-            case "CONST", "VNAME" -> {
-                return generateBasicAtomic(expr);
-            }
-            case "FNAME" -> {
+            case "CALL" -> {
                 StringBuilder sb = new StringBuilder();
                 ParseNode fname = expr.children.get(0);
                 

@@ -1,18 +1,16 @@
 main 
-    num V_globalVar
+    num V_sum, text V_value
     begin 
-        V_globalVar = 3;
-        if eq(mul(V_globalVar, 1), 3)
-        then 
-            begin
-                print "First";
-                print "Plus";
-                print "First";
-            end
-        else
-            begin
-                print "Second";
-                print "Plus";
-                print "Second";
-            end;
+        print V_sum;
+        print "Hello";
+        skip;
+        skip;
+        print V_value; 
+        V_value = "Helloworl";    
+        print V_value; 
+        V_value < input;   
+        print V_value; 
+        F_addition(V_x, V_y, V_x);
+        V_value = F_addition(V_x, V_y, V_x);
+        V_value = V_value;
     end

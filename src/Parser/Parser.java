@@ -158,11 +158,15 @@ public class Parser {
             return null;
         }
 
+        ParseNode decl = new ParseNode("DECL");
+
         // match header
-        node.addChild(parseFuncHeader());
+        decl.addChild(parseFuncHeader());
 
         // match body
-        node.addChild(parseFuncBody());
+        decl.addChild(parseFuncBody());
+
+        node.addChild(decl);
 
         // match another header type
         if(this.current.type == TokenType.NUM || this.current.type == TokenType.FVOID){
@@ -391,17 +395,14 @@ public class Parser {
     }
 
     private ParseNode parseVNAME(){
-        ParseNode node = new ParseNode("VNAME");
-
         matchType(TokenType.VNAME);
-        node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+        ParseNode node = new ParseNode(this.current, ParseType.TERMINAL);
         this.advance();
-
         return node;
     }
 
     private ParseNode parseFNAMECALL(){
-        ParseNode node = new ParseNode("FNAME");
+        ParseNode node = new ParseNode("CALL");
 
         // FNAME
         matchType(TokenType.FNAME);
@@ -441,12 +442,9 @@ public class Parser {
     }
 
     private ParseNode parseCONST(){
-        ParseNode node = new ParseNode("CONST");
-
         matchTwoTypes(TokenType.NUMLIT, TokenType.TEXTLIT);
-        node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+        ParseNode node = new ParseNode(this.current, ParseType.TERMINAL);
         this.advance();
-
         return node;
     }
 

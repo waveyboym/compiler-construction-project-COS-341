@@ -1,13 +1,15 @@
-10 LET V_globalVar = 0
-20 V_globalVar = 3
-30 IF (V_globalVar * 1) = 3 THEN GOTO 40 ELSE GOTO 80
-40 PRINT "First"
-50 PRINT "Plus"
-60 PRINT "First"
-70 GOTO 110
-80 PRINT "Second"
-90 PRINT "Plus"
-100 PRINT "Second"
-110 GOTO 120
-120 ENDIF
-130 END
+10 LET V_sum = 0
+20 LET V_value = ""
+30 PRINT V_sum
+40 PRINT "Hello"
+50 GOTO 60
+60 GOTO 70
+70 PRINT V_value
+80 V_value = "Helloworl"
+90 PRINT V_value
+100 INPUT V_value
+110 PRINT V_value
+120 CALL F_addition(V_x, V_y, V_x)
+130 V_value = CALL F_addition(V_x, V_y, V_x)
+140 V_value = V_value
+150 END
