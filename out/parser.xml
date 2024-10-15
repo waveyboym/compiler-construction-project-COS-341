@@ -2,16 +2,16 @@
 <PARSETREE>
  <PROG>
    <MAIN>
-    <ID>18864aea-4607-45b5-83d1-f24dcb8fd218</ID>
+    <ID>bb775d74-ef3a-4b77-97a0-6b18a8e6718f</ID>
     <VALUE>main</VALUE>
    </MAIN>
    <GLOBVARS>
      <NUM>
-      <ID>91920af2-296e-4d9e-b777-fc1e6b28f572</ID>
+      <ID>08428716-e98c-49e5-90c5-23af4b005a65</ID>
       <VALUE>num</VALUE>
      </NUM>
      <VNAME>
-      <ID>1a119a39-d5c0-43d0-b82f-9c05f10cd5ed</ID>
+      <ID>a59470fc-bc26-41d4-ab63-cc73c5b7deaa</ID>
       <VALUE>V_sum</VALUE>
      </VNAME>
      <COMMA>
@@ -33,94 +33,109 @@
 
    <ALGO>
      <BEGIN>
-      <ID>7fb8a440-ac3c-468b-89ac-6d085dea2d35</ID>
+      <ID>04a6a60d-6c72-4399-9219-4f5cb4556ca7</ID>
       <VALUE>begin</VALUE>
      </BEGIN>
      <INSTRUC>
        <COMMAND>
-         <PRINT>
-          <ID>efa2688b-1c91-4d97-9594-56370731a74f</ID>
-          <VALUE>print</VALUE>
-         </PRINT>
-         <ATOMIC>
-           <VNAME>
-             <VNAME>
-              <ID>91e6efa8-b4a1-4a57-9d33-9bb3c88adf31</ID>
-              <VALUE>V_sum</VALUE>
-             </VNAME>
-           </VNAME>
-
-         </ATOMIC>
-
-       </COMMAND>
-
-       <SEMICOLON>
-        <ID>6e61be25-687f-48f5-aaca-71f613bc45af</ID>
-        <VALUE>;</VALUE>
-       </SEMICOLON>
-       <INSTRUC>
-         <COMMAND>
-           <PRINT>
-            <ID>2d9a9d7a-b58f-4bcf-9fef-643f1ce6e4d6</ID>
-            <VALUE>print</VALUE>
-           </PRINT>
-           <ATOMIC>
-             <CONST>
-               <TEXTLIT>
-                <ID>784e6dfb-126a-4247-b6eb-725adbd90012</ID>
-                <VALUE>Hello</VALUE>
-               </TEXTLIT>
-             </CONST>
+         <BRANCH>
+           <IF>
+            <ID>0bef43bb-a42d-435c-9d21-ed275ef9ed3e</ID>
+            <VALUE>if</VALUE>
+           </IF>
+           <UNOPCSIMPLE>
+             <NOT>
+              <ID>bdfac583-cae7-40cb-ac13-78f60dddfcd3</ID>
+              <VALUE>not</VALUE>
+             </NOT>
+             <LEFT_PAREN>
+              <ID>537da0c1-854d-4dd8-a5a6-db00fb3f3735</ID>
+              <VALUE>(</VALUE>
+             </LEFT_PAREN>
+             <BINOPCOMPOSITE>
+               <AND>
+                <ID>3850c173-d26b-4df1-8146-b193d8212c7b</ID>
+                <VALUE>and</VALUE>
+               </AND>
+               <LEFT_PAREN>
+                <ID>bb797050-5f16-42ec-b986-5faebe1aa5a9</ID>
+                <VALUE>(</VALUE>
+               </LEFT_PAREN>
+               <BINOPSIMPLE>
+                 <ATOMIC>
+                   <CONST>
+                     <NUMLIT>
+                      <ID>5b68deba-1938-46dd-9e16-d95284382b0a</ID>
+                      <VALUE>5</VALUE>
+                     </NUMLIT>
+                   </CONST>
 
            </ATOMIC>
 
-         </COMMAND>
+               </BINOPSIMPLE>
 
-         <SEMICOLON>
-          <ID>15cd6256-9c7e-46f0-ad07-abfaf2c4740b</ID>
-          <VALUE>;</VALUE>
-         </SEMICOLON>
-         <INSTRUC>
-           <COMMAND>
-             <SKIP>
-              <ID>f97607eb-e0a9-41ee-87d6-ab424651919d</ID>
-              <VALUE>skip</VALUE>
-             </SKIP>
-           </COMMAND>
-
-           <SEMICOLON>
-            <ID>3e1dc8b3-7765-4851-8aad-9fd5758e10bb</ID>
-            <VALUE>;</VALUE>
-           </SEMICOLON>
-           <INSTRUC>
-             <COMMAND>
-               <SKIP>
-                <ID>3886f107-e461-4eed-9776-6ed5e915a10f</ID>
-                <VALUE>skip</VALUE>
-               </SKIP>
-             </COMMAND>
-
-             <SEMICOLON>
-              <ID>942df256-1c21-4573-8b9c-1ae9c56f976e</ID>
-              <VALUE>;</VALUE>
-             </SEMICOLON>
-             <INSTRUC>
-               <COMMAND>
-                 <PRINT>
-                  <ID>f4a35783-29bc-4c58-9fbe-413cc6c33549</ID>
-                  <VALUE>print</VALUE>
-                 </PRINT>
+               <COMMA>
+                <ID>87c36364-4730-46bc-a7e2-a52c92832418</ID>
+                <VALUE>,</VALUE>
+               </COMMA>
+               <BINOPSIMPLE>
                  <ATOMIC>
-                   <VNAME>
-                     <VNAME>
-                      <ID>891d9c5d-1002-4c6a-8be0-c4eff64e5aaa</ID>
-                      <VALUE>V_value</VALUE>
-                     </VNAME>
-                   </VNAME>
+                   <CONST>
+                     <NUMLIT>
+                      <ID>f9dd6a27-5d4a-43bb-afe0-fd93055b30ad</ID>
+                      <VALUE>5</VALUE>
+                     </NUMLIT>
+                   </CONST>
 
                  </ATOMIC>
 
-               </COMMAND>
+               </BINOPSIMPLE>
+
+               <RIGHT_PAREN>
+                <ID>c5f12da4-24ab-4dbf-888a-44079f781f37</ID>
+                <VALUE>)</VALUE>
+               </RIGHT_PAREN>
+             </BINOPCOMPOSITE>
+
+             <RIGHT_PAREN>
+              <ID>e2257aac-edfb-447c-931a-7df72d94f05f</ID>
+              <VALUE>)</VALUE>
+             </RIGHT_PAREN>
+           </UNOPCSIMPLE>
+
+           <THEN>
+            <ID>e5fdb545-6850-4d79-9181-3590f1bad274</ID>
+            <VALUE>then</VALUE>
+           </THEN>
+           <ALGO>
+             <BEGIN>
+              <ID>479f406a-09ee-438e-b2a4-c9f01f582feb</ID>
+              <VALUE>begin</VALUE>
+             </BEGIN>
+             <END>
+              <ID>dfcb80cc-35b7-4717-854e-5afbf5da10ea</ID>
+              <VALUE>end</VALUE>
+             </END>
+           </ALGO>
+
+           <ELSE>
+            <ID>ed7b3a01-b5a7-460e-a114-75fc9c5c54ff</ID>
+            <VALUE>else</VALUE>
+           </ELSE>
+           <ALGO>
+             <BEGIN>
+              <ID>8fd80848-d7c6-4da3-b4f6-49d40c15d5dc</ID>
+              <VALUE>begin</VALUE>
+             </BEGIN>
+             <END>
+              <ID>226f63ba-3f83-47bb-a443-da7c46239fb3</ID>
+              <VALUE>end</VALUE>
+             </END>
+           </ALGO>
+
+         </BRANCH>
+
+       </COMMAND>
 
                <SEMICOLON>
                 <ID>0b5f8651-06c2-4151-ba9a-9421cf29b7ca</ID>
@@ -137,7 +152,7 @@
      </INSTRUC>
 
      <END>
-      <ID>caeb34b6-c4a5-4f5a-88b1-a2d51eac635b</ID>
+      <ID>08597e35-b3a1-4f6c-b194-da496fdf3d42</ID>
       <VALUE>end</VALUE>
      </END>
    </ALGO>
