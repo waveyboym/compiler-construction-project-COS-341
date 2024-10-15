@@ -106,6 +106,11 @@ public class CodeGenBasic {
                     sb.append(generateBasicAtomic(command.children.get(1)));
                     sb.append("\n");
                 }
+                case TokenType.RETURN -> {
+                    sb.append(Line()).append(" RETURN ");
+                    sb.append(generateBasicAtomic(command.children.get(1)));
+                    sb.append("\n");
+                }
                 default -> throw new IllegalArgumentException("Unexpected value: " + command.children.get(0).token.type);
             }
         }else{
@@ -113,7 +118,7 @@ public class CodeGenBasic {
                 case "ASSIGN" -> {
                     sb.append(generateBasicAssign(command.children.get(0)));
                 }
-                case "CALL" -> {
+                case "FNAME" -> {
                     sb.append(generateBasicCall(command.children.get(0)));
                 }
                 case "BRANCH" -> {
@@ -157,51 +162,149 @@ public class CodeGenBasic {
     }
 
     private String generateBasicExpr(ParseNode expr){
-        // expected: EXPR := ATOMIC | FNAME ( ATOMIC, ATMOIC, ATOMIC )
-        if(expr.children.get(0).nonterminalname.equals("CONST")){
-            return generateBasicAtomic(expr);
+        // expected: EXPR := ATOMIC | FNAME ( ATOMIC, ATMOIC, ATOMIC ) | OP
+        switch (expr.children.get(0).nonterminalname) {
+            case "CONST", "VNAME" -> {
+                return generateBasicAtomic(expr);
+            }
+            case "FNAME" -> {
+                StringBuilder sb = new StringBuilder();
+                ParseNode fname = expr.children.get(0);
+                
+                sb.append("CALL ");
+                sb.append(fname.children.get(0).token.Value);
+                sb.append("(");
+                sb.append(generateBasicAtomic(fname.children.get(2)));
+                sb.append(", ");
+                sb.append(generateBasicAtomic(fname.children.get(4)));
+                sb.append(", ");
+                sb.append(generateBasicAtomic(fname.children.get(6)));
+                sb.append(")");
+                
+                return sb.toString();
+            }
+            default -> {
+                String op = generateBasicOP(expr.children.get(0));
+                // remove the first and last character which are "(" and ")" to conform to the expected output
+                return op.substring(1, op.length() - 1);
+            }
+        }
+    }
+
+    private String generateBasicOP(ParseNode op){
+        // expected: OP := OR, AND, EQ, GT, ADD, SUB, MUL, DIV (ARG1, ARG2) | NOT, SQRT (ARG)
+        // equivalent BASIC syntax code: (ARG OP ARG)
+        StringBuilder sb = new StringBuilder();
+
+        switch (op.children.get(0).token.type) {
+            case NOT -> {
+                sb.append("(");
+                sb.append("NOT ");
+                sb.append(generateBasicArg(op.children.get(2)));
+                sb.append(")");
+                return sb.toString();
+            }
+            case SQRT -> {
+                sb.append("(");
+                sb.append("SQRT ");
+                sb.append("(");
+                sb.append(generateBasicArg(op.children.get(2)));
+                sb.append(")");
+                sb.append(")");
+                return sb.toString();
+            }
+            default -> {
+                sb.append("(");
+                sb.append(generateBasicArg(op.children.get(2)));
+                sb.append(" ");
+                sb.append(generateBasicOPrepr(op.children.get(0).token.type));
+                sb.append(" ");
+                sb.append(generateBasicArg(op.children.get(4)));
+                sb.append(")");
+            }
+        }
+
+        return sb.toString();
+    }
+
+    private String generateBasicArg(ParseNode arg){
+        // expected: ARG := ATOMIC | OP
+        if(arg.children.get(0).nonterminalname.equals("ATOMIC")){
+            return generateBasicAtomic(arg.children.get(0));
         }else{
-            StringBuilder sb = new StringBuilder();
-
-            sb.append("CALL ");
-            sb.append(expr.children.get(0).token.Value);
-            sb.append("(");
-            sb.append(generateBasicAtomic(expr.children.get(2)));
-            sb.append(", ");
-            sb.append(generateBasicAtomic(expr.children.get(4)));
-            sb.append(", ");
-            sb.append(generateBasicAtomic(expr.children.get(6)));
-            sb.append(")");
-
-            return sb.toString();
+            return generateBasicOP(arg.children.get(0));
         }
     }
 
     private String generateBasicCall(ParseNode call){
         // expected: CALL := FNAME
-        // equivalent BASIC syntax code: LN CALL FNAME(arg1, arg2, ...)
+        // equivalent BASIC syntax code: LN CALL FNAME(arg1, arg2, arg3)
         StringBuilder sb = new StringBuilder();
 
         sb.append(Line()).append(" CALL ");
         sb.append(call.children.get(0).token.Value);
+        sb.append("(");
+        sb.append(generateBasicAtomic(call.children.get(2)));
+        sb.append(", ");
+        sb.append(generateBasicAtomic(call.children.get(4)));
+        sb.append(", ");
+        sb.append(generateBasicAtomic(call.children.get(6)));
+        sb.append(")");
         sb.append("\n");
 
         return sb.toString();
     }
 
     private String generateBasicBranch(ParseNode branch){
-        // expected: BRANCH := if EXPR then INSTRUC else INSTRUC
-        // equivalent BASIC syntax code: LN IF EXPR THEN GOTO LN+10
+        // expected: BRANCH := if COND then ALGO else ALGO
+        // equivalent BASIC syntax code: 
+        //LN IF COND THEN GOTO LN+10 ELSE GOTO LN+20
+        //LN+10 ALGO1
+        //LN+20 GOTO LN+40
+        //LN+30 ALGO2
+        //LN+40
+
         StringBuilder sb = new StringBuilder();
 
         sb.append(Line()).append(" IF ");
-        sb.append(generateBasicExpr(branch.children.get(1)));
+        //sb.append(generateBasicCond(branch.children.get(1)));
         sb.append(" THEN GOTO ");
         sb.append(this.line + 10);
+        sb.append(" ELSE GOTO ");
+        String instruc1 = generateBasicAlgo(branch.children.get(3));
+        sb.append(this.line + 10);
         sb.append("\n");
+        String instruc2 = Line() + " GOTO ";
+        String instruc3 = generateBasicAlgo(branch.children.get(5));
+        instruc2 += this.line + 10;
+        sb.append("\n");
+        sb.append(instruc1);
+        sb.append(instruc2);
+        sb.append(instruc3);
+        sb.append(Line()).append(" GOTO ").append(this.line + 10).append("\n");
 
         return sb.toString();
     }
+
+    /*private String generateBasicCond(ParseNode cond){
+        // expected: COND := UNOP | BINOP
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(generateBasicAtomic(cond.children.get(0)));
+        sb.append(" ");
+        sb.append(cond.children.get(1).token.Value);
+        sb.append(" ");
+        sb.append(generateBasicAtomic(cond.children.get(2));
+
+        return sb.toString();
+    }*/
+
+    /* 
+    private String generateBasicUnop(ParseNode unop){
+        // expected: UNOP := not|sqrt(BINOP)
+        // equivalent BASIC syntax code: 
+        return "NOT " + generateBasicCond(unop.children.get(1));
+    }*/
 
     private String generateBasicVname(ParseNode vname){
         // expected: VNAME := ID
@@ -221,4 +324,41 @@ public class CodeGenBasic {
         }
     }
 
+    private String generateBasicOPrepr(TokenType type){
+        switch (type) {
+            case NOT -> {
+                return "NOT";
+            }
+            case SQRT -> {
+                return "SQR";
+            }
+            case OR -> {
+                return "OR";
+            }
+            case AND -> {
+                return "AND";
+            }
+            case EQ -> {
+                return "=";
+            }
+            case GT -> {
+                return ">";
+            }
+            case ADD -> {
+                return "+";
+            }
+            case SUB -> {
+                return "-";
+            }
+            case MUL -> {
+                return "*";
+            }
+            case DIV -> {
+                return "/";
+            }
+            default -> {
+                throw new IllegalArgumentException("Unexpected value: " + type);
+            }
+        }
+    }
 }

@@ -1,13 +1,10 @@
+
 import CodeGenBasic.CodeGenBasic;
 import Interfaces.ParseNode;
-import Interfaces.SyntaxTreeNode;
 import Interfaces.Token;
 import Lexer.Lexer;
 import Parser.Parser;
-import ScopeAnalyzer.ScopeAnalyzer;
 import Utils.FileManager;
-import Utils.SyntaxTreeParser;
-import Utils.XMLGenerator;
 import java.util.List;
 
 public class App {
@@ -29,20 +26,20 @@ public class App {
             Lexer lexer = new Lexer(contents, path);
             List<Token> tokens = lexer.scanTokens();
 
-            String xmllex = XMLGenerator.generateLEXERXML(tokens);
-            FileManager.createAndWriteFile("out/lexer.xml", xmllex);
+            //String xmllex = XMLGenerator.generateLEXERXML(tokens);
+            //FileManager.createAndWriteFile("out/lexer.xml", xmllex);
 
             System.out.println("Lexing Competed Successfully");
 
             Parser parser = new Parser(tokens);
             ParseNode pt = parser.parse();
 
-            String xmlparse = XMLGenerator.generatePARSERXML(pt);
-            FileManager.createAndWriteFile("out/parser.xml", xmlparse);
+            //String xmlparse = XMLGenerator.generatePARSERXML(pt);
+            //FileManager.createAndWriteFile("out/parser.xml", xmlparse);
 
             System.out.println("Parsing Completed Successfully");
 
-            SyntaxTreeParser stp = new SyntaxTreeParser();
+            /*SyntaxTreeParser stp = new SyntaxTreeParser();
             SyntaxTreeNode st = stp.parse("out/parser.xml");
 
             if (st == null) {
@@ -53,11 +50,10 @@ public class App {
             ScopeAnalyzer scopeAnalyzer = new ScopeAnalyzer();
             scopeAnalyzer.analyze(st);
 
-            System.out.println("Scope Analysis Completed Successfully");
+            System.out.println("Scope Analysis Completed Successfully");*/
 
             CodeGenBasic cgb = new CodeGenBasic(pt);
             FileManager.writeBasicCode("out/basic.bas", cgb.generateCode());
-            System.out.println(pt.toString());
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }

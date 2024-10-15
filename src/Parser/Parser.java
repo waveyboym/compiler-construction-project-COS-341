@@ -180,12 +180,7 @@ public class Parser {
         node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
         this.advance();
 
-        // match 3 vnames
         // vname 1
-        matchTwoTypes(TokenType.NUM, TokenType.VTEXT);
-        node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
-        this.advance();
-        
         matchType(TokenType.VNAME);
         node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
         this.advance();
@@ -196,10 +191,6 @@ public class Parser {
         this.advance();
 
         // vname 2
-        matchTwoTypes(TokenType.NUM, TokenType.VTEXT);
-        node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
-        this.advance();
-
         matchType(TokenType.VNAME);
         node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
         this.advance();
@@ -210,10 +201,6 @@ public class Parser {
         this.advance();
 
         // vname 3
-        matchTwoTypes(TokenType.NUM, TokenType.VTEXT);
-        node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
-        this.advance();
-
         matchType(TokenType.VNAME);
         node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
         this.advance();
@@ -341,6 +328,13 @@ public class Parser {
                 node.addChild(parseIF());
                 return node;
             }
+            case RETURN -> {
+                //RETURN
+                node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+                this.advance();
+                node.addChild(parseAtomic());
+                return node;
+            }
             default -> throw new RuntimeException(Errors.formatParserError(this.current, "SKIP, HALT, PRINT, VNAME, FNAME, IF, INPUT", currentLine));
         }
     }
@@ -462,7 +456,69 @@ public class Parser {
                 node.addChild(parseFNAMECALL());
                 break;
             }
-            default -> node.addChild(parseCondition());
+            default -> node.addChild(parseOp());
+        }
+
+        return node;
+    }
+
+    private ParseNode parseOp(){
+        ParseNode node = new ParseNode("OP");
+
+        switch (this.current.type) {// unop or binop
+            case NOT, SQRT -> {
+                // expect unop
+                node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+                this.advance();
+
+                // advance and expect (
+                matchType(TokenType.LEFT_PAREN);
+                node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+                this.advance();
+
+                node.addChild(parseArg());
+
+                // advance and expect )
+                matchType(TokenType.RIGHT_PAREN);
+                node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+                this.advance();
+            }
+            case OR, AND, EQ, GT, ADD, SUB, MUL, DIV -> {
+                // expect binop
+                node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+                this.advance();
+
+                // advance and expect (
+                matchType(TokenType.LEFT_PAREN);
+                node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+                this.advance();
+
+                node.addChild(parseArg());
+
+                // advance and expect ,
+                matchType(TokenType.COMMA);
+                node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+                this.advance();
+
+                node.addChild(parseArg());
+
+                // advance and expect )
+                matchType(TokenType.RIGHT_PAREN);
+                node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+                this.advance();
+            }
+            default -> throw new RuntimeException(Errors.formatParserError(this.current, "NOT, SQRT, OR, AND, EQ, GT, ADD, SUB, MUL, DIV", currentLine));
+        }
+
+        return node;
+    }
+
+    private ParseNode parseArg(){
+        ParseNode node = new ParseNode("ARG");
+
+        switch (this.current.type) {// unop or binop
+            case NOT, SQRT, OR, AND, EQ, GT, ADD, SUB, MUL, DIV -> node.addChild(parseOp());
+            default -> node.addChild(parseAtomic());
         }
 
         return node;
@@ -501,8 +557,8 @@ public class Parser {
         ParseNode node = new ParseNode("COND");
 
         switch (this.current.type) {// unop or binop
-            case NOT, SQRT -> node = parseUnopBuilder();
-            case OR, AND, EQ, GT, ADD, SUB, MUL, DIV -> node = parseBinopBuilder(true);
+            case NOT, SQRT -> node.addChild(parseUnopBuilder());
+            case OR, AND, EQ, GT, ADD, SUB, MUL, DIV -> node.addChild(parseBinopBuilder(true));
             default -> throw new RuntimeException(Errors.formatParserError(this.current, "NOT, SQRT, OR, AND, EQ, GT, ADD, SUB, MUL, DIV", currentLine));
         }
 
@@ -515,7 +571,7 @@ public class Parser {
         if((this.current.type == TokenType.OR || this.current.type == TokenType.AND || this.current.type == TokenType.EQ || this.current.type == TokenType.GT
                 || this.current.type == TokenType.ADD || this.current.type == TokenType.SUB || this.current.type == TokenType.MUL || this.current.type == TokenType.DIV)
                 && recursive){
-            node = parseBinopBuilder(false);
+            node.addChild(parseBinopBuilder(false));
         } else {
             node.addChild(parseAtomic());
         }

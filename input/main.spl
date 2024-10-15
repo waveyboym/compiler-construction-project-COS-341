@@ -1,13 +1,10 @@
 main 
-    num V_sum, text V_value
+    num V_globalVar
     begin 
-        print V_sum;
-        print "Hello";
-        skip;
-        skip;
-        print V_value; 
-        V_value = "Helloworld";    
-        print V_value; 
-        V_value < input;   
-        print V_value; 
+        V_globalVar = mul(10, add(add(10, 10), 10));
+        print V_globalVar;
+        V_globalVar = sqrt(10);
+        print V_globalVar;
+        V_globalVar = not(1);
+        print V_globalVar;
     end
