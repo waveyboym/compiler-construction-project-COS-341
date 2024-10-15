@@ -84,13 +84,23 @@ public class Parser {
         this.advance();
 
         // globvars
-        node.addChild(parseGLOBVARS());
+        ParseNode gbVars = parseGLOBVARS();
+        if(gbVars != null){
+            node.addChild(gbVars);
+        } else {
+            node.addChild(new ParseNode("GLOBVARS"));
+        }
 
         // algo
         node.addChild(parseAlgo());
 
         // functions
-        node.addChild(parseFUNCTIONS());
+        ParseNode functions = parseFUNCTIONS();
+        if(functions != null){
+            node.addChild(functions);
+        } else {
+            node.addChild(new ParseNode("FUNCTIONS"));
+        }
 
         return node;
     }
@@ -580,7 +590,7 @@ public class Parser {
     }
 
     private ParseNode parseUnopBuilder(){
-        ParseNode node = new ParseNode("UNOPCSIMPLE");
+        ParseNode node = new ParseNode("UNOPSIMPLE");
 
         // expect unop
         node.addChild(new ParseNode(this.current, ParseType.TERMINAL));

@@ -31,8 +31,8 @@ public class CodeGenBasic {
         ParseNode ALGO = pt.children.get(2);
         sb.append(generateBasicAlgo(ALGO));
 
-        // remove final "\n" which is the last character in the string
-        return sb.toString().substring(0, sb.length() - 1);
+        // add final END statement
+        return sb.append(Line()).append(" END\n").toString();
     }
 
     private String generateBasicGlobalVariables(ParseNode gbvars){
@@ -65,7 +65,7 @@ public class CodeGenBasic {
     private String generateBasicAlgo(ParseNode algo){
         // expected: ALGO := begin INSTRUC end
         // ignore begin and end
-        return generateBasicInstruc(algo.children.get(1)) + Line() + " END\n";
+        return generateBasicInstruc(algo.children.get(1));
     }
 
     private String generateBasicInstruc(ParseNode instruc){
@@ -267,44 +267,87 @@ public class CodeGenBasic {
         StringBuilder sb = new StringBuilder();
 
         sb.append(Line()).append(" IF ");
-        //sb.append(generateBasicCond(branch.children.get(1)));
+        sb.append(generateBasicCond(branch.children.get(1)));
         sb.append(" THEN GOTO ");
         sb.append(this.line + 10);
         sb.append(" ELSE GOTO ");
         String instruc1 = generateBasicAlgo(branch.children.get(3));
-        sb.append(this.line + 10);
-        sb.append("\n");
         String instruc2 = Line() + " GOTO ";
+        sb.append(this.line + 10);
         String instruc3 = generateBasicAlgo(branch.children.get(5));
-        instruc2 += this.line + 10;
+        instruc2 += String.valueOf((this.line + 10));
         sb.append("\n");
         sb.append(instruc1);
         sb.append(instruc2);
+        sb.append("\n");
         sb.append(instruc3);
         sb.append(Line()).append(" GOTO ").append(this.line + 10).append("\n");
+        sb.append(Line()).append(" ENDIF\n");
 
         return sb.toString();
     }
 
-    /*private String generateBasicCond(ParseNode cond){
+    private String generateBasicCond(ParseNode cond){
         // expected: COND := UNOP | BINOP
         StringBuilder sb = new StringBuilder();
 
-        sb.append(generateBasicAtomic(cond.children.get(0)));
-        sb.append(" ");
-        sb.append(cond.children.get(1).token.Value);
-        sb.append(" ");
-        sb.append(generateBasicAtomic(cond.children.get(2));
+        if(cond.children.get(0).nonterminalname.equals("UNOPSIMPLE")){
+            sb.append(generateBasicUnop(cond.children.get(0)));
+        }else{
+            sb.append(generateBasicBinopComposite(cond.children.get(0)));
+        }
 
-        return sb.toString();
-    }*/
+        String op = sb.toString();
+        // remove the first and last character which are "(" and ")" to conform to the expected output
+        return op.substring(1, op.length() - 1);
+    }
 
-    /* 
     private String generateBasicUnop(ParseNode unop){
         // expected: UNOP := not|sqrt(BINOP)
+        // equivalent BASIC syntax code: (NOT ARG) | (SQRT (ARG))
+        StringBuilder sb = new StringBuilder();
+
+        if(unop.children.get(0).token.type == TokenType.NOT){
+            sb.append("(");
+            sb.append("NOT ");
+            sb.append(generateBasicArg(unop.children.get(1)));
+            sb.append(")");
+        }else{
+            sb.append("(");
+            sb.append("SQRT ");
+            sb.append("(");
+            sb.append(generateBasicBinop(unop.children.get(2)));
+            sb.append(")");
+            sb.append(")");
+        }
+
+        return sb.toString();
+    }
+
+    private String generateBasicBinopComposite(ParseNode binop){
+        // expected: BINOP := ATOMIC RELOP ATOMIC
         // equivalent BASIC syntax code: 
-        return "NOT " + generateBasicCond(unop.children.get(1));
-    }*/
+        // (ARG RELOP ARG)
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("(");
+        sb.append(generateBasicBinop(binop.children.get(2)));
+        sb.append(" ");
+        sb.append(generateBasicOPrepr(binop.children.get(0).token.type));
+        sb.append(" ");
+        sb.append(generateBasicBinop(binop.children.get(4)));
+        sb.append(")");
+
+        return sb.toString();
+    }
+
+    private String generateBasicBinop(ParseNode binop){
+        if(binop.children.get(0).nonterminalname.equals("ATOMIC")){
+            return generateBasicAtomic(binop.children.get(0));
+        }else{
+            return generateBasicOP(binop.children.get(0));
+        }
+    }
 
     private String generateBasicVname(ParseNode vname){
         // expected: VNAME := ID
