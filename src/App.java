@@ -3,6 +3,7 @@ import Interfaces.SyntaxTreeNode;
 import Interfaces.Token;
 import Lexer.Lexer;
 import Parser.Parser;
+import ScopeAnalyzer.ScopeAnalyzer;
 import Utils.FileManager;
 import Utils.SyntaxTreeParser;
 import Utils.XMLGenerator;
@@ -29,19 +30,33 @@ public class App {
 
             String xmllex = XMLGenerator.generateLEXERXML(tokens);
             FileManager.createAndWriteFile("out/lexer.xml", xmllex);
-            
+
+            System.out.println("Lexing Competed Successfully");
+
             Parser parser = new Parser(tokens);
             ParseNode pt = parser.parse();
-            
+
             String xmlparse = XMLGenerator.generatePARSERXML(pt);
             FileManager.createAndWriteFile("out/parser.xml", xmlparse);
 
             System.out.println(pt.toString());
 
+            System.out.println("Parsing Completed Successfully");
+
             SyntaxTreeParser stp = new SyntaxTreeParser();
             SyntaxTreeNode st = stp.parse("out/parser.xml");
-            
+
+            if (st == null) {
+                System.err.println("Failed to parse syntax tree.");
+                return;
+            }
+
+            // Perform scope analysis
+            ScopeAnalyzer scopeAnalyzer = new ScopeAnalyzer();
+            scopeAnalyzer.analyze(st);
+
             System.out.println(st.toString());
+            System.out.println("Scope Analysis Completed Successfully");
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
