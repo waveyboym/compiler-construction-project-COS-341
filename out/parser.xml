@@ -2,55 +2,70 @@
 <PARSETREE>
  <PROG>
    <MAIN>
-    <ID>ee5df660-a728-4689-97c9-125de0dc420f</ID>
+    <ID>68e93845-ff1a-49f6-a44e-c7943585e537</ID>
     <VALUE>main</VALUE>
    </MAIN>
    <GLOBVARS>
      <NUM>
-      <ID>bab14b42-4862-4eb2-a8ea-36489af6e3dc</ID>
+      <ID>dfc3acf2-cb43-4e3d-8be6-3915be94c03c</ID>
       <VALUE>num</VALUE>
      </NUM>
      <VNAME>
-      <ID>51301430-1445-4177-af4e-6562784cc4d1</ID>
+      <ID>0bf02da8-53e3-471d-8460-94fc93b40bf7</ID>
       <VALUE>V_sum</VALUE>
      </VNAME>
+     <COMMA>
+      <ID>40a0420b-c0e4-4222-b5db-b8030e96efd0</ID>
+      <VALUE>,</VALUE>
+     </COMMA>
+     <GLOBVARS>
+       <NUM>
+        <ID>d00d770d-512d-400e-b674-67d1c659c2a6</ID>
+        <VALUE>num</VALUE>
+       </NUM>
+       <VNAME>
+        <ID>5f46cb06-7e6e-44eb-84fd-b65ebc5bc351</ID>
+        <VALUE>V_sum</VALUE>
+       </VNAME>
+     </GLOBVARS>
+
    </GLOBVARS>
 
    <ALGO>
      <BEGIN>
-      <ID>648e28dd-4d40-4460-bd5d-41b39c83c452</ID>
+      <ID>5f85cac0-6fa6-4955-8294-13902d4fa2e1</ID>
       <VALUE>begin</VALUE>
      </BEGIN>
      <INSTRUC>
        <COMMAND>
          <BRANCH>
            <IF>
-            <ID>c210b377-fbe9-4440-89ed-a5fd983e3675</ID>
+            <ID>102571e0-9b2c-4a8d-9e5e-0b80f1bf41c3</ID>
             <VALUE>if</VALUE>
            </IF>
            <UNOPCSIMPLE>
              <NOT>
-              <ID>20bf0f23-3383-4fab-a768-ddf6d02260ac</ID>
+              <ID>56b4a86e-e09f-468b-af96-4f3a613665ec</ID>
               <VALUE>not</VALUE>
              </NOT>
              <LEFT_PAREN>
-              <ID>2bd289eb-adb5-4d1d-9cbb-8e018eebe1af</ID>
+              <ID>49fd8257-22ed-4439-bccd-d025bc97567e</ID>
               <VALUE>(</VALUE>
              </LEFT_PAREN>
              <BINOPCOMPOSITE>
                <AND>
-                <ID>664632ed-dfac-4308-8357-26853a0b1a0a</ID>
+                <ID>a25cbb19-508e-4a99-a254-6dda974929fc</ID>
                 <VALUE>and</VALUE>
                </AND>
                <LEFT_PAREN>
-                <ID>ab66b3b5-1c16-45a8-ad2d-5cab14d5e147</ID>
+                <ID>a5f7ce85-2d87-4d80-ab1a-81e9235bf39e</ID>
                 <VALUE>(</VALUE>
                </LEFT_PAREN>
                <BINOPSIMPLE>
                  <ATOMIC>
                    <CONST>
                      <NUMLIT>
-                      <ID>37ff7353-d1a7-4210-ac40-05b2ef6bba45</ID>
+                      <ID>0889e890-8e0c-4cce-ba86-0988b766f691</ID>
                       <VALUE>5</VALUE>
                      </NUMLIT>
                    </CONST>
@@ -60,14 +75,14 @@
                </BINOPSIMPLE>
 
                <COMMA>
-                <ID>d5172268-2baf-40e7-b3ff-52681df5ab28</ID>
+                <ID>fde38bbd-5e0b-4585-baf6-0e5984cb288f</ID>
                 <VALUE>,</VALUE>
                </COMMA>
                <BINOPSIMPLE>
                  <ATOMIC>
                    <CONST>
                      <NUMLIT>
-                      <ID>52e6bdaf-cf97-47d5-bf26-b13959b53cac</ID>
+                      <ID>bf49dee2-2394-4fd6-b07f-4d8f37927625</ID>
                       <VALUE>5</VALUE>
                      </NUMLIT>
                    </CONST>
@@ -77,43 +92,43 @@
                </BINOPSIMPLE>
 
                <RIGHT_PAREN>
-                <ID>79c3c03d-bdf1-4a19-aaac-2470f31e7b8c</ID>
+                <ID>b9564b1a-f755-448a-ab58-54cdad637a39</ID>
                 <VALUE>)</VALUE>
                </RIGHT_PAREN>
              </BINOPCOMPOSITE>
 
              <RIGHT_PAREN>
-              <ID>becd601e-986b-4f37-ae49-5b0fe77f7053</ID>
+              <ID>32598cdd-fc4a-47cb-bed4-5dab559de99b</ID>
               <VALUE>)</VALUE>
              </RIGHT_PAREN>
            </UNOPCSIMPLE>
 
            <THEN>
-            <ID>83ecbf27-01e2-4c38-89aa-08fae20c88c0</ID>
+            <ID>d05f0283-f3eb-4092-96e1-0d15645ab781</ID>
             <VALUE>then</VALUE>
            </THEN>
            <ALGO>
              <BEGIN>
-              <ID>d814dba5-8569-42d4-a0e1-cc0df860230b</ID>
+              <ID>c3d1f293-3aeb-4e1b-83a7-3b1119ba90ef</ID>
               <VALUE>begin</VALUE>
              </BEGIN>
              <END>
-              <ID>7be4896b-62d0-4581-891f-79564a73c50d</ID>
+              <ID>1d77deed-3411-4df1-88ea-882c13c2cd6d</ID>
               <VALUE>end</VALUE>
              </END>
            </ALGO>
 
            <ELSE>
-            <ID>fe0c6432-b4d4-40a6-b2c8-52e5ae35e4ef</ID>
+            <ID>80c0a8f4-fd40-47b9-a280-82b6dd7c9383</ID>
             <VALUE>else</VALUE>
            </ELSE>
            <ALGO>
              <BEGIN>
-              <ID>8edc7da4-5200-4a18-83d8-6a2ce1945020</ID>
+              <ID>40d0b965-4f07-4305-8d9d-f11337203fd2</ID>
               <VALUE>begin</VALUE>
              </BEGIN>
              <END>
-              <ID>cffe7357-bb4b-46eb-b0a9-b90bfe2f4fd5</ID>
+              <ID>a27e1a98-d3e0-47a9-a7fc-b5a0aad1bdca</ID>
               <VALUE>end</VALUE>
              </END>
            </ALGO>
@@ -125,7 +140,7 @@
      </INSTRUC>
 
      <END>
-      <ID>0f090707-e82f-439b-8ed5-6b97461c156b</ID>
+      <ID>69351953-2e35-4fc7-91cb-464b7a636ae5</ID>
       <VALUE>end</VALUE>
      </END>
    </ALGO>
