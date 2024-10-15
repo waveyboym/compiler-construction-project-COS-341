@@ -40,10 +40,6 @@ public class App {
             String xmlparse = XMLGenerator.generatePARSERXML(pt);
             FileManager.createAndWriteFile("out/parser.xml", xmlparse);
 
-            CodeGenBasic cgb = new CodeGenBasic(pt);
-            FileManager.writeBasicCode("out/basic.bas", cgb.generateCode());
-            System.out.println(pt.toString());
-
             System.out.println("Parsing Completed Successfully");
 
             SyntaxTreeParser stp = new SyntaxTreeParser();
@@ -54,12 +50,14 @@ public class App {
                 return;
             }
 
-            // Perform scope analysis
             ScopeAnalyzer scopeAnalyzer = new ScopeAnalyzer();
             scopeAnalyzer.analyze(st);
 
-            System.out.println(st.toString());
             System.out.println("Scope Analysis Completed Successfully");
+
+            CodeGenBasic cgb = new CodeGenBasic(pt);
+            FileManager.writeBasicCode("out/basic.bas", cgb.generateCode());
+            System.out.println(pt.toString());
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
