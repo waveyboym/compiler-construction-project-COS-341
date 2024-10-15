@@ -260,7 +260,7 @@ public class Lexer {
                     String value = "";
                     value += this.current;
                     advance();
-                    for (int i = 0; i < 9; i++) {
+                    for (int i = 1; i < 9; i++) {
                         if (Character.isLowerCase(this.current)) {
                             value += this.current;
                             advance();
