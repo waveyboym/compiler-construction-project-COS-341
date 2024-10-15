@@ -1,4 +1,4 @@
-import CodeGenBasic.CodeGenBasic;
+//import CodeGenBasic.CodeGenBasic;
 import Interfaces.ParseNode;
 import Interfaces.SyntaxTreeNode;
 import Interfaces.Token;
@@ -55,11 +55,12 @@ public class App {
 
             System.out.println("Scope Analysis Completed Successfully");
 
-            CodeGenBasic cgb = new CodeGenBasic(pt);
-            FileManager.writeBasicCode("out/basic.bas", cgb.generateCode());
-            System.out.println(pt.toString());
+            // CodeGenBasic cgb = new CodeGenBasic(pt);
+            // FileManager.writeBasicCode("out/basic.bas", cgb.generateCode());
+            // System.out.println(pt.toString());
         } catch (Exception e) {
             System.out.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 }

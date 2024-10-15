@@ -12,7 +12,7 @@ public enum TokenType {
     OR, AND, EQ, GT, ADD, SUB, MUL, DIV,
 
     // Variable Types and Function Return Types
-    NUM, VTEXT, FVOID,
+    NUM, VTEXT, FVOID, TEXT, VOID,
 
     // Variables.
     VNAME, FNAME,
@@ -28,7 +28,7 @@ public enum TokenType {
     PROG, PARSETREE, GLOBVARS, ALGO, INSTRUC, 
     COMMAND, BRANCH, VALUE, ID, CONST, ATOMIC, 
     BINOPSIMPLE, BINOPCOMPOSITE, UNOPCSIMPLE,
-    FUNCTIONS, DECL,
+    FUNCTIONS, DECL, LOCALVARS, CALL, HEADER, BODY,
 
     // Null, this token will be discarded in the lexing phase
     NULLTYPE,
