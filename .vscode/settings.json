@@ -5,6 +5,9 @@
         "lib/**/*.jar"
     ],
     "cSpell.words": [
-        "PARSETREE"
+        "GLOBVARS",
+        "LOCALVARS",
+        "PARSETREE",
+        "VNAME"
     ]
 }

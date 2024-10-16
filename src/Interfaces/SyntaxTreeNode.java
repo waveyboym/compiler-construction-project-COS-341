@@ -13,6 +13,11 @@ public class SyntaxTreeNode {
         this.symbol = symbol;
     }
 
+    public SyntaxTreeNode(TokenType symbol, String value) {
+        this.symbol = symbol;
+        this.value = value;
+    }
+
     public void addChild(SyntaxTreeNode child) {
         children.add(child);
     }
