@@ -1,15 +1,10 @@
 10 LET V_sum = 0
-20 LET V_value = ""
+20 V_sum = F_addition(1, 2, 3)
 30 PRINT V_sum
-40 PRINT "Hello"
-50 GOTO 60
-60 GOTO 70
-70 PRINT V_value
-80 V_value = "Helloworl"
-90 PRINT V_value
-100 INPUT V_value
-110 PRINT V_value
-120 CALL F_addition(V_x, V_y, V_x)
-130 V_value = CALL F_addition(V_x, V_y, V_x)
-140 V_value = V_value
-150 END
+40
+50 SUB F_addition(V_x, V_y, V_z)
+60  LOCAL V_result1, V_result2, V_result3
+70 V_result1 = V_x + (V_y + V_z)
+80 RETURN V_result1
+90 END SUB
+100 END

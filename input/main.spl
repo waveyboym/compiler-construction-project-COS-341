@@ -1,16 +1,16 @@
 main 
-    num V_sum, text V_value
+    num V_sum
     begin 
+        V_sum = F_addition(1, 2, 3);
         print V_sum;
-        print "Hello";
-        skip;
-        skip;
-        print V_value; 
-        V_value = "Helloworl";    
-        print V_value; 
-        V_value < input;   
-        print V_value; 
-        F_addition(V_x, V_y, V_x);
-        V_value = F_addition(V_x, V_y, V_x);
-        V_value = V_value;
     end
+
+num F_addition(V_x, V_y, V_z)
+{
+    num V_result1, num V_result2, num V_result3,
+    begin
+       V_result1 = add(V_x, add(V_y, V_z));
+       return V_result1;
+    end
+}
+end
