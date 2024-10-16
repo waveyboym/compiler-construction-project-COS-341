@@ -12,7 +12,6 @@ public class ScopeAnalyzer {
     private int functionCounter = 0;
     private List<String> errors = new ArrayList<>();
     private Set<String> reservedKeywords = new HashSet<>(Arrays.asList(
-            // Add all reserved keywords from your language specification
             "main", "begin", "end", "num", "text", "void", "if", "then", "else",
             "skip", "halt", "print", "input", "return", "not", "sqrt", "or", "and",
             "eq", "grt", "add", "sub", "mul", "div"));
@@ -20,12 +19,16 @@ public class ScopeAnalyzer {
     public void analyze(SyntaxTreeNode root) {
         // Initialize the global scope
         currentScope = new Scope(null, "global", 0);
+
+        // First pass: Collect function declarations
+        collectFunctionDeclarations(root);
+
+        // Second pass: Full scope analysis
         traverse(root);
 
-        // After traversal, you can output errors or proceed
+        // After traversal, output errors or proceed
         if (!errors.isEmpty()) {
             System.err.println("Semantic Errors:");
-
             for (String error : errors) {
                 System.err.println(error);
             }
@@ -34,37 +37,50 @@ public class ScopeAnalyzer {
         }
     }
 
+    private void collectFunctionDeclarations(SyntaxTreeNode node) {
+        if (node.symbol == TokenType.FUNCTIONS) {
+            for (SyntaxTreeNode child : node.children) {
+                if (child.symbol == TokenType.DECL) {
+                    handleFunctionDeclaration(child, true);
+                }
+            }
+        } else {
+            for (SyntaxTreeNode child : node.children) {
+                collectFunctionDeclarations(child);
+            }
+        }
+    }
+
     private void traverse(SyntaxTreeNode node) {
         TokenType symbol = node.symbol;
 
         switch (symbol) {
-            case TokenType.PROG:
+            case PROG:
                 handleProgram(node);
                 break;
-            case TokenType.GLOBVARS:
-            case TokenType.LOCALVARS:
+            case GLOBVARS:
+            case LOCALVARS:
                 handleVariableDeclarations(node, symbol == TokenType.GLOBVARS ? "global" : "local");
                 break;
-            case TokenType.FUNCTIONS:
+            case FUNCTIONS:
                 handleFunctions(node);
                 break;
-            case TokenType.DECL:
-                handleFunctionDeclaration(node);
+            case DECL:
+                handleFunctionDeclaration(node, false);
                 break;
-            case TokenType.CALL:
-                handleFunctionUsage(node);
+            case CALL:
+                handleFunctionCall(node);
                 break;
-            case TokenType.VNAME:
+            case VNAME:
                 handleVariableUsage(node);
                 break;
-            case TokenType.FNAME:
+            case FNAME:
                 // This might be a function usage outside of CALL
                 break;
             default:
                 for (SyntaxTreeNode child : node.children) {
                     traverse(child);
                 }
-
                 break;
         }
     }
@@ -83,7 +99,7 @@ public class ScopeAnalyzer {
         if (node.symbol == TokenType.GLOBVARS || node.symbol == TokenType.LOCALVARS) {
             List<SyntaxTreeNode> declarations = node.children;
 
-            if (declarations.size() == 0) {
+            if (declarations.isEmpty()) {
                 return;
             }
 
@@ -104,6 +120,8 @@ public class ScopeAnalyzer {
                 reportError("Variable '" + varName + "' is already declared in this scope.");
             } else if (varName != null && reservedKeywords.contains(varName)) {
                 reportError("Variable name '" + varName + "' is a reserved keyword.");
+            } else if (varName != null && currentScope.lookupFunction(varName) != null) {
+                reportError("Variable name '" + varName + "' conflicts with a function name.");
             } else if (varName != null) {
                 // Assign unique internal name
                 String uniqueName = "v" + (++variableCounter);
@@ -129,15 +147,14 @@ public class ScopeAnalyzer {
     private void handleFunctions(SyntaxTreeNode node) {
         for (SyntaxTreeNode child : node.children) {
             if (child.symbol == TokenType.DECL) {
-                handleFunctionDeclaration(child);
+                handleFunctionDeclaration(child, false);
             } else {
                 traverse(child);
             }
         }
     }
 
-    private void handleFunctionDeclaration(SyntaxTreeNode node) {
-        // node represents a DECL node
+    private void handleFunctionDeclaration(SyntaxTreeNode node, boolean firstPass) {
         // Extract HEADER and BODY
         SyntaxTreeNode bodyNode = null;
         SyntaxTreeNode headerNode = null;
@@ -183,6 +200,12 @@ public class ScopeAnalyzer {
             reportError("Function '" + funcName + "' is already declared in this scope.");
         } else if (reservedKeywords.contains(funcName)) {
             reportError("Function name '" + funcName + "' is a reserved keyword.");
+        } else if (currentScope.lookup(funcName) != null) {
+            reportError("Function name '" + funcName + "' conflicts with a variable name.");
+        } else if (funcName.equals(currentScope.scopeName)) {
+            reportError("Function name '" + funcName + "' is the same as its parent scope name.");
+        } else if (currentScope.hasSiblingScope(funcName)) {
+            reportError("Function name '" + funcName + "' is the same as one of its sibling scopes.");
         } else {
             // Assign unique internal name
             String uniqueName = "f" + (++functionCounter);
@@ -200,49 +223,51 @@ public class ScopeAnalyzer {
                 }
             }
 
-            // Enter new function scope
-            Scope functionScope = new Scope(currentScope, funcName, currentScope.scopeLevel + 1);
-            currentScope = functionScope;
+            if (!firstPass) {
+                // Enter new function scope
+                Scope functionScope = new Scope(currentScope, funcName, currentScope.scopeLevel + 1);
+                currentScope = functionScope;
 
-            // Handle function parameters (treated as local variables)
-            for (SyntaxTreeNode paramNode : params) {
-                String paramName = paramNode.value;
-                if (paramName != null && paramName.startsWith("V_")) {
-                    paramName = paramName.substring(2);
+                // Handle function parameters (treated as local variables)
+                for (SyntaxTreeNode paramNode : params) {
+                    String paramName = paramNode.value;
+                    if (paramName != null && paramName.startsWith("V_")) {
+                        paramName = paramName.substring(2);
+                    }
+
+                    if (currentScope.containsInCurrentScope(paramName)) {
+                        reportError("Parameter '" + paramName + "' is already declared in this scope.");
+                    } else if (reservedKeywords.contains(paramName)) {
+                        reportError("Parameter name '" + paramName + "' is a reserved keyword.");
+                    } else {
+                        // Assign unique internal name
+                        String uniqueParamName = "v" + (++variableCounter);
+
+                        // Create symbol table entry
+                        SymbolTableEntry paramEntry = new SymbolTableEntry(paramName, uniqueParamName, "param",
+                                currentScope.scopeLevel, paramNode, "variable");
+                        currentScope.addSymbol(paramEntry);
+
+                        // Update the parameter name in the syntax tree to the unique name
+                        paramNode.value = uniqueParamName;
+                    }
                 }
 
-                if (currentScope.containsInCurrentScope(paramName)) {
-                    reportError("Parameter '" + paramName + "' is already declared in this scope.");
-                } else if (reservedKeywords.contains(paramName)) {
-                    reportError("Parameter name '" + paramName + "' is a reserved keyword.");
-                } else {
-                    // Assign unique internal name
-                    String uniqueParamName = "v" + (++variableCounter);
-
-                    // Create symbol table entry
-                    SymbolTableEntry paramEntry = new SymbolTableEntry(paramName, uniqueParamName, "param",
-                            currentScope.scopeLevel, paramNode, "variable");
-                    currentScope.addSymbol(paramEntry);
-
-                    // Update the parameter name in the syntax tree to the unique name
-                    paramNode.value = uniqueParamName;
+                // Handle local variables in LOCVARS
+                for (SyntaxTreeNode child : bodyNode.children) {
+                    if (child.symbol == TokenType.LOCALVARS) {
+                        handleVariableDeclarations(child, "local");
+                    }
                 }
-            }
 
-            // Handle local variables in LOCVARS
-            for (SyntaxTreeNode child : bodyNode.children) {
-                if (child.symbol == TokenType.LOCALVARS) {
-                    handleVariableDeclarations(child, "local");
+                // Traverse the function body
+                for (SyntaxTreeNode child : bodyNode.children) {
+                    traverse(child);
                 }
-            }
 
-            // Traverse the function body
-            for (SyntaxTreeNode child : bodyNode.children) {
-                traverse(child);
+                // Exit function scope
+                currentScope = currentScope.parent;
             }
-
-            // Exit function scope
-            currentScope = currentScope.parent;
         }
     }
 
@@ -263,8 +288,7 @@ public class ScopeAnalyzer {
         }
     }
 
-    private void handleFunctionUsage(SyntaxTreeNode node) {
-        // node represents a function call
+    private void handleFunctionCall(SyntaxTreeNode node) {
         // Extract function name
         String funcName = null;
 
@@ -276,13 +300,18 @@ public class ScopeAnalyzer {
                     funcName = funcName.substring(2);
                 }
 
-                SymbolTableEntry entry = currentScope.lookup(funcName);
+                SymbolTableEntry entry = currentScope.lookupFunction(funcName);
 
                 if (entry == null) {
                     reportError("Function '" + funcName + "' is not declared.");
                 } else {
                     // Replace the name with the unique internal name
                     child.value = entry.uniqueName;
+                }
+
+                // Check for recursive call to main
+                if (funcName.equals("main")) {
+                    reportError("Recursive call to main is not allowed.");
                 }
 
                 break;

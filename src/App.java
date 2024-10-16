@@ -27,7 +27,7 @@ public class App {
         String contents = FileManager.readFileAndReturnContents(path);
 
         try {
-            /*Lexer lexer = new Lexer(contents, path);
+            Lexer lexer = new Lexer(contents, path);
             List<Token> tokens = lexer.scanTokens();
 
             String xmllex = XMLGenerator.generateLEXERXML(tokens);
@@ -41,7 +41,7 @@ public class App {
             String xmlparse = XMLGenerator.generatePARSERXML(pt);
             FileManager.createAndWriteFile("out/parser.xml", xmlparse);
 
-            System.out.println("Parsing Completed Successfully");*/
+            System.out.println("Parsing Completed Successfully");
 
             SyntaxTreeParser stp = new SyntaxTreeParser();
             SyntaxTreeNode st = stp.parse("out/parser.xml");
