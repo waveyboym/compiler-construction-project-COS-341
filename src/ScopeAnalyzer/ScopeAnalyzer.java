@@ -51,6 +51,10 @@ public class ScopeAnalyzer {
         }
     }
 
+    public List<String> getErrors() {
+        return errors;
+    }
+
     private void traverse(SyntaxTreeNode node) {
         TokenType symbol = node.symbol;
 
@@ -201,7 +205,7 @@ public class ScopeAnalyzer {
         } else if (reservedKeywords.contains(funcName)) {
             reportError("Function name '" + funcName + "' is a reserved keyword.");
         } else if (currentScope.lookup(funcName) != null) {
-            reportError("Function name '" + funcName + "' conflicts with a variable name.");
+            reportError("Function name '" + funcName + "' conflicts with a variable or function name.");
         } else if (funcName.equals(currentScope.scopeName)) {
             reportError("Function name '" + funcName + "' is the same as its parent scope name.");
         } else if (currentScope.hasSiblingScope(funcName)) {
@@ -311,7 +315,7 @@ public class ScopeAnalyzer {
 
                 // Check for recursive call to main
                 if (funcName.equals("main")) {
-                    reportError("Recursive call to main is not allowed.");
+                    reportError("Recursive call to 'main' is not allowed.");
                 }
 
                 break;
