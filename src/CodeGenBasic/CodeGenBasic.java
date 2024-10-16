@@ -24,12 +24,15 @@ public class CodeGenBasic {
         StringBuilder sb = new StringBuilder();
 
         // GLOBVARS
-        ParseNode GLOBVARS = pt.children.get(1);
-        sb.append(generateBasicGlobalVariables(GLOBVARS));
+        sb.append(generateBasicGlobalVariables(pt.children.get(1)));
 
         // ALGO
-        ParseNode ALGO = pt.children.get(2);
-        sb.append(generateBasicAlgo(ALGO));
+        sb.append(generateBasicAlgo(pt.children.get(2)));
+
+        sb.append(Line()).append("\n");
+
+        // FUNCTIONS
+        sb.append(generateBasicFunctions(pt.children.get(3), ""));
 
         // add final END statement
         return sb.append(Line()).append(" END\n").toString();
@@ -68,6 +71,91 @@ public class CodeGenBasic {
         return generateBasicInstruc(algo.children.get(1));
     }
 
+    private String generateBasicFunctions(ParseNode functions, String indent){
+        // expected: FUNCTIONS := DECL FUNCTIONS | ε
+        if(functions.children.isEmpty()){
+            return "";
+        }
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(generateBasicDecl(functions.children.get(0), indent));
+
+        if(functions.children.size() > 1){
+            sb.append(generateBasicFunctions(functions.children.get(1), indent));
+        }
+
+        return sb.toString();
+    }
+
+    private String generateBasicDecl(ParseNode decl, String indent){
+        // expected: DECL := HEADER BODY
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(Line()).append(" ").append(generateBasicHeader(decl.children.get(0), indent));
+        sb.append(generateBasicBody(decl.children.get(1), indent));
+
+        return sb.toString();
+    }
+
+    private String generateBasicHeader(ParseNode header, String indent){
+        // expected: HEADER := FTYPE FNAME ( ARG1, ARG2, ARG3 )
+        // equivalent BASIC syntax code: SUB FNAME(ARG1, ARG2, ARG3)
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(indent);
+        sb.append("SUB ");
+        sb.append(header.children.get(1).token.Value);
+        sb.append("(");
+        sb.append(header.children.get(3).token.Value);
+        sb.append(", ");
+        sb.append(header.children.get(5).token.Value);
+        sb.append(", ");
+        sb.append(header.children.get(7).token.Value);
+        sb.append(")\n");
+
+        return sb.toString();
+    }
+
+    private String generateBasicBody(ParseNode body, String indent){
+        // expected: BODY := { locvars algo } subfunctions end
+        // equivalent BASIC syntax code:
+        // LN LOCAL VNAME1, VNAME2
+        // LN ALGO
+        // LN FUNCTIONS
+        // LN END SUB
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(Line()).append(" ").append(generateBasicLocvars(body.children.get(1)));
+
+        sb.append(generateBasicAlgo(body.children.get(2)));
+
+        if(body.children.get(4).token == null){
+            sb.append(Line()).append(" ").append(generateBasicFunctions(body.children.get(4), indent + " "));
+        }
+
+        sb.append(Line()).append(" ").append("END SUB\n");
+
+        return sb.toString();
+    }
+
+    private String generateBasicLocvars(ParseNode locvars){
+        // expected: LOCVARS := VTYPE VNAME , VTYPE VNAME , VTYPE VNAME ,
+        // equivalent BASIC syntax code: LN LOCAL VNAME1, VNAME2, VNAME3
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(" LOCAL ");
+        sb.append(locvars.children.get(1).token.Value);
+        sb.append(", ");
+        sb.append(locvars.children.get(4).token.Value);
+        sb.append(", ");
+        sb.append(locvars.children.get(7).token.Value);
+        sb.append("\n");
+
+        return sb.toString();
+    }
+
     private String generateBasicInstruc(ParseNode instruc){
         // expected: INSTRUC := COMMAND ; INSTRUC | ε
         if(instruc.children.isEmpty()){
@@ -92,7 +180,7 @@ public class CodeGenBasic {
         // halt: LN END
         // print ATOMIC: LN PRINT ATOMIC
         // ASSIGN: LN VNAME = EXPR
-        // CALL: LN CALL FNAME
+        // CALL: LN FNAME
         // BRANCH: LN IF EXPR THEN GOTO LN+10
 
         StringBuilder sb = new StringBuilder();
@@ -118,7 +206,7 @@ public class CodeGenBasic {
                 case "ASSIGN" -> {
                     sb.append(generateBasicAssign(command.children.get(0)));
                 }
-                case "FNAME" -> {
+                case "CALL" -> {
                     sb.append(generateBasicCall(command.children.get(0)));
                 }
                 case "BRANCH" -> {
@@ -133,10 +221,10 @@ public class CodeGenBasic {
 
     private String generateBasicAtomic(ParseNode atomic){
         // expected: ATOMIC := VNAME | CONST
-        if(atomic.children.get(0).nonterminalname.equals("VNAME")){
-            return generateBasicVname(atomic.children.get(0));
+        if(atomic.children.get(0).token.type == TokenType.VNAME){
+            return generateBasicVname(atomic);
         }else{
-            return geneareBasicConst(atomic.children.get(0));
+            return geneareBasicConst(atomic);
         }
     }
 
@@ -149,10 +237,10 @@ public class CodeGenBasic {
         if(assign.children.get(1).token.type == TokenType.LESS_THAN_SIGN){
             // we are receiving input from user
             sb.append("INPUT ");
-            sb.append(generateBasicVname(assign.children.get(0)));
+            sb.append(generateBasicVname(assign));
             sb.append("\n");
         } else {
-            sb.append(generateBasicVname(assign.children.get(0)));
+            sb.append(generateBasicVname(assign));
             sb.append(" = ");
             sb.append(generateBasicExpr(assign.children.get(2)));
             sb.append("\n");
@@ -163,15 +251,14 @@ public class CodeGenBasic {
 
     private String generateBasicExpr(ParseNode expr){
         // expected: EXPR := ATOMIC | FNAME ( ATOMIC, ATMOIC, ATOMIC ) | OP
+        if(expr.children.get(0).token != null){
+            return generateBasicAtomic(expr);
+        }
         switch (expr.children.get(0).nonterminalname) {
-            case "CONST", "VNAME" -> {
-                return generateBasicAtomic(expr);
-            }
-            case "FNAME" -> {
+            case "CALL" -> {
                 StringBuilder sb = new StringBuilder();
                 ParseNode fname = expr.children.get(0);
                 
-                sb.append("CALL ");
                 sb.append(fname.children.get(0).token.Value);
                 sb.append("(");
                 sb.append(generateBasicAtomic(fname.children.get(2)));
@@ -238,10 +325,10 @@ public class CodeGenBasic {
 
     private String generateBasicCall(ParseNode call){
         // expected: CALL := FNAME
-        // equivalent BASIC syntax code: LN CALL FNAME(arg1, arg2, arg3)
+        // equivalent BASIC syntax code: LN FNAME(arg1, arg2, arg3)
         StringBuilder sb = new StringBuilder();
 
-        sb.append(Line()).append(" CALL ");
+        sb.append(Line()).append(" ");
         sb.append(call.children.get(0).token.Value);
         sb.append("(");
         sb.append(generateBasicAtomic(call.children.get(2)));
