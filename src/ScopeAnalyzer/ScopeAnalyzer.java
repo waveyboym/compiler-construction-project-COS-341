@@ -15,7 +15,7 @@ public class ScopeAnalyzer {
             // Add all reserved keywords from your language specification
             "main", "begin", "end", "num", "text", "void", "if", "then", "else",
             "skip", "halt", "print", "input", "return", "not", "sqrt", "or", "and",
-            "eq", "grt", "add", "sub", "mul", "div", "VNAME", "FNAME"));
+            "eq", "grt", "add", "sub", "mul", "div"));
 
     public void analyze(SyntaxTreeNode root) {
         // Initialize the global scope
@@ -284,7 +284,7 @@ public class ScopeAnalyzer {
                     // Replace the name with the unique internal name
                     child.value = entry.uniqueName;
                 }
-                
+
                 break;
             }
         }
