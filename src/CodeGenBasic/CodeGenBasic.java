@@ -24,10 +24,10 @@ public class CodeGenBasic {
         StringBuilder sb = new StringBuilder();
 
         // GLOBVARS
-        sb.append(generateBasicGlobalVariables(pt.children.get(1)));
+        sb.append(generateBasicGlobalVariables(pt.children.get(1), ""));
 
         // ALGO
-        sb.append(generateBasicAlgo(pt.children.get(2)));
+        sb.append(generateBasicAlgo(pt.children.get(2), ""));
 
         sb.append(Line()).append("\n");
 
@@ -38,7 +38,7 @@ public class CodeGenBasic {
         return sb.append(Line()).append(" END\n").toString();
     }
 
-    private String generateBasicGlobalVariables(ParseNode gbvars){
+    private String generateBasicGlobalVariables(ParseNode gbvars, String indent){
         // expected: GLOBVARS := VTYPE VNAME , GLOBVARS | ε
         // equivalent BASIC syntax code: LN LET VNAME = 0
         if(gbvars.children.isEmpty()){
@@ -53,22 +53,22 @@ public class CodeGenBasic {
         if(null == vtype.token.type){
             throw new IllegalArgumentException("Unexpected value: " + vtype.token.type);
         } else switch (vtype.token.type) {
-            case NUM -> sb.append(Line()).append(" LET ").append(vname.token.Value).append(" = 0\n");
-            case VTEXT -> sb.append(Line()).append(" LET ").append(vname.token.Value).append(" = \"\"\n");
+            case NUM -> sb.append(Line()).append(indent).append(" LET ").append(vname.token.Value).append(" = 0\n");
+            case VTEXT -> sb.append(Line()).append(indent).append(" LET ").append(vname.token.Value).append(" = \"\"\n");
             default -> throw new IllegalArgumentException("Unexpected value: " + vtype.token.type);
         }
 
         if(gbvars.children.size() > 2){
-            sb.append(generateBasicGlobalVariables(gbvars.children.get(3)));
+            sb.append(generateBasicGlobalVariables(gbvars.children.get(3), indent));
         }
 
         return sb.toString();
     }
 
-    private String generateBasicAlgo(ParseNode algo){
+    private String generateBasicAlgo(ParseNode algo, String indent){
         // expected: ALGO := begin INSTRUC end
         // ignore begin and end
-        return generateBasicInstruc(algo.children.get(1));
+        return generateBasicInstruc(algo.children.get(1), indent);
     }
 
     private String generateBasicFunctions(ParseNode functions, String indent){
@@ -127,12 +127,12 @@ public class CodeGenBasic {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append(Line()).append(" ").append(generateBasicLocvars(body.children.get(1)));
+        sb.append(Line()).append(indent).append("\t").append(generateBasicLocvars(body.children.get(1)));
 
-        sb.append(generateBasicAlgo(body.children.get(2)));
+        sb.append(generateBasicAlgo(body.children.get(2), indent + "\t"));
 
         if(body.children.get(4).token == null){
-            sb.append(Line()).append(" ").append(generateBasicFunctions(body.children.get(4), indent + " "));
+            sb.append(Line()).append(" ").append(generateBasicFunctions(body.children.get(4), indent + "\t"));
         }
 
         sb.append(Line()).append(" ").append("END SUB\n");
@@ -156,7 +156,7 @@ public class CodeGenBasic {
         return sb.toString();
     }
 
-    private String generateBasicInstruc(ParseNode instruc){
+    private String generateBasicInstruc(ParseNode instruc, String indent){
         // expected: INSTRUC := COMMAND ; INSTRUC | ε
         if(instruc.children.isEmpty()){
             return "";
@@ -164,16 +164,16 @@ public class CodeGenBasic {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append(generateBasicCommand(instruc.children.get(0)));
+        sb.append(generateBasicCommand(instruc.children.get(0), indent));
 
         if(instruc.children.size() > 2){
-            sb.append(generateBasicInstruc(instruc.children.get(2)));
+            sb.append(generateBasicInstruc(instruc.children.get(2), indent));
         }
 
         return sb.toString();
     }
 
-    private String generateBasicCommand(ParseNode command){
+    private String generateBasicCommand(ParseNode command, String indent){
         // expected: COMMAND := skip | halt | print ATOMIC | ASSIGN | CALL | BRANCH
         // equivalent BASIC syntax code:
         // skip: LN GOTO LN+10
@@ -187,15 +187,15 @@ public class CodeGenBasic {
 
         if(command.children.get(0).type == ParseType.TERMINAL){
             switch(command.children.get(0).token.type){
-                case TokenType.SKIP -> sb.append(Line()).append(" GOTO ").append(this.line + 10).append("\n");
-                case TokenType.HALT -> sb.append(Line()).append(" END\n");
+                case TokenType.SKIP -> sb.append(Line()).append(indent).append(" GOTO ").append(this.line + 10).append("\n");
+                case TokenType.HALT -> sb.append(Line()).append(indent).append(" END\n");
                 case TokenType.PRINT -> {
-                    sb.append(Line()).append(" PRINT ");
+                    sb.append(Line()).append(indent).append(" PRINT ");
                     sb.append(generateBasicAtomic(command.children.get(1)));
                     sb.append("\n");
                 }
                 case TokenType.RETURN -> {
-                    sb.append(Line()).append(" RETURN ");
+                    sb.append(Line()).append(indent).append(" RETURN ");
                     sb.append(generateBasicAtomic(command.children.get(1)));
                     sb.append("\n");
                 }
@@ -204,13 +204,13 @@ public class CodeGenBasic {
         }else{
             switch(command.children.get(0).nonterminalname){
                 case "ASSIGN" -> {
-                    sb.append(generateBasicAssign(command.children.get(0)));
+                    sb.append(generateBasicAssign(command.children.get(0), indent));
                 }
                 case "CALL" -> {
-                    sb.append(generateBasicCall(command.children.get(0)));
+                    sb.append(generateBasicCall(command.children.get(0), indent));
                 }
                 case "BRANCH" -> {
-                    sb.append(generateBasicBranch(command.children.get(0)));
+                    sb.append(generateBasicBranch(command.children.get(0), indent));
                 }
                 default -> throw new IllegalArgumentException("Unexpected value: " + command.children.get(0).nonterminalname);
             }
@@ -228,12 +228,12 @@ public class CodeGenBasic {
         }
     }
 
-    private String generateBasicAssign(ParseNode assign){
+    private String generateBasicAssign(ParseNode assign, String indent){
         // expected: ASSIGN := VNAME = EXPR
         // equivalent BASIC syntax code: LN VNAME = EXPR
         StringBuilder sb = new StringBuilder();
 
-        sb.append(Line()).append(" ");
+        sb.append(Line()).append(indent).append(" ");
         if(assign.children.get(1).token.type == TokenType.LESS_THAN_SIGN){
             // we are receiving input from user
             sb.append("INPUT ");
@@ -323,12 +323,12 @@ public class CodeGenBasic {
         }
     }
 
-    private String generateBasicCall(ParseNode call){
+    private String generateBasicCall(ParseNode call, String indent){
         // expected: CALL := FNAME
         // equivalent BASIC syntax code: LN FNAME(arg1, arg2, arg3)
         StringBuilder sb = new StringBuilder();
 
-        sb.append(Line()).append(" ");
+        sb.append(Line()).append(indent).append(" ");
         sb.append(call.children.get(0).token.Value);
         sb.append("(");
         sb.append(generateBasicAtomic(call.children.get(2)));
@@ -342,7 +342,7 @@ public class CodeGenBasic {
         return sb.toString();
     }
 
-    private String generateBasicBranch(ParseNode branch){
+    private String generateBasicBranch(ParseNode branch, String indent){
         // expected: BRANCH := if COND then ALGO else ALGO
         // equivalent BASIC syntax code: 
         //LN IF COND THEN GOTO LN+10 ELSE GOTO LN+20
@@ -353,23 +353,23 @@ public class CodeGenBasic {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append(Line()).append(" IF ");
+        sb.append(Line()).append(indent).append(" IF ");
         sb.append(generateBasicCond(branch.children.get(1)));
         sb.append(" THEN GOTO ");
         sb.append(this.line + 10);
         sb.append(" ELSE GOTO ");
-        String instruc1 = generateBasicAlgo(branch.children.get(3));
-        String instruc2 = Line() + " GOTO ";
+        String instruc1 = generateBasicAlgo(branch.children.get(3), indent + "\t");
+        String instruc2 = Line() + indent + " GOTO ";
         sb.append(this.line + 10);
-        String instruc3 = generateBasicAlgo(branch.children.get(5));
+        String instruc3 = generateBasicAlgo(branch.children.get(5), indent + "\t");
         instruc2 += String.valueOf((this.line + 10));
         sb.append("\n");
         sb.append(instruc1);
         sb.append(instruc2);
         sb.append("\n");
         sb.append(instruc3);
-        sb.append(Line()).append(" GOTO ").append(this.line + 10).append("\n");
-        sb.append(Line()).append(" ENDIF\n");
+        sb.append(Line()).append(indent).append(" GOTO ").append(this.line + 10).append("\n");
+        sb.append(Line()).append(indent).append(" ENDIF\n");
 
         return sb.toString();
     }
