@@ -1,11 +1,13 @@
-//import CodeGenBasic.CodeGenBasic;
+import CodeGenBasic.CodeGenBasic;
 import Interfaces.ParseNode;
 import Interfaces.SyntaxTreeNode;
 import Interfaces.Token;
 import Lexer.Lexer;
 import Parser.Parser;
 import ScopeAnalyzer.ScopeAnalyzer;
+import TypeChecker.TypeChecker;
 import Utils.FileManager;
+import Utils.Scope;
 import Utils.SyntaxTreeParser;
 import Utils.XMLGenerator;
 
@@ -56,9 +58,16 @@ public class App {
 
             System.out.println("Scope Analysis Completed Successfully");
 
-            // CodeGenBasic cgb = new CodeGenBasic(pt);
-            // FileManager.writeBasicCode("out/basic.bas", cgb.generateCode());
-            // System.out.println(pt.toString());
+            Scope globalScope = scopeAnalyzer.getGlobalScope();
+            TypeChecker typeChecker = new TypeChecker(globalScope);
+            typeChecker.typecheck(st);
+
+            System.out.println("Type Checking Completed Successfully");
+
+            CodeGenBasic cgb = new CodeGenBasic(pt);
+            FileManager.writeBasicCode("out/basic.bas", cgb.generateCode());
+
+            System.out.println("Code Generation Completed Successfully");
         } catch (Exception e) {
             System.out.println(e.getMessage());
             e.printStackTrace();

@@ -32,9 +32,11 @@ public class ScopeAnalyzer {
             for (String error : errors) {
                 System.err.println(error);
             }
-        } else {
-            System.out.println("Scope analysis completed successfully.");
         }
+    }
+
+    public Scope getGlobalScope() {
+        return currentScope;
     }
 
     private void collectFunctionDeclarations(SyntaxTreeNode node) {
