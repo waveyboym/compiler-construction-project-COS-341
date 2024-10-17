@@ -5,9 +5,20 @@
         "lib/**/*.jar"
     ],
     "cSpell.words": [
+        "BINOP",
+        "COMPOSIT",
+        "epilog",
+        "FTYP",
         "GLOBVARS",
+        "INSTRUC",
         "LOCALVARS",
+        "Locvars",
         "PARSETREE",
-        "VNAME"
+        "prolog",
+        "subfuncs",
+        "typecheck",
+        "UNOP",
+        "VNAME",
+        "vtyp"
     ]
 }
