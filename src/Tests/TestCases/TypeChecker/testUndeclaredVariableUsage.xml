@@ -1,0 +1,13 @@
+<PROG>
+    <ALGO>
+        <INSTRUC>
+            <ASSIGN>
+                <VNAME>V_x</VNAME>
+                <OPERATOR>=</OPERATOR>
+                <TERM>
+                    <CONST>N_10</CONST>
+                </TERM>
+            </ASSIGN>
+        </INSTRUC>
+    </ALGO>
+</PROG>
