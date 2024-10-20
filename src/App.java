@@ -1,5 +1,7 @@
 import CodeGenBasic.CodeGenBasic;
+import CodeGenIM.CodeGenIM;
 import Interfaces.ParseNode;
+import Interfaces.SyntaxTreeNode;
 import Interfaces.Token;
 import Lexer.Lexer;
 import Parser.Parser;
@@ -39,29 +41,34 @@ public class App {
             Parser parser = new Parser(tokens);
             ParseNode pt = parser.parse();
 
-            //String xmlparse = XMLGenerator.generatePARSERXML(pt);
-            //FileManager.createAndWriteFile("out/parser.xml", xmlparse);
+            String xmlparse = XMLGenerator.generatePARSERXML(pt);
+            FileManager.createAndWriteFile("out/parser.xml", xmlparse);
 
             System.out.println("Parsing Completed Successfully");
 
-            //SyntaxTreeParser stp = new SyntaxTreeParser();
-            //SyntaxTreeNode st = stp.parse("out/parser.xml");
+            SyntaxTreeParser stp = new SyntaxTreeParser();
+            SyntaxTreeNode st = stp.parse("out/parser.xml");
 
-            //if (st == null) {
-            //    System.err.println("Failed to parse syntax tree.");
-            //    return;
-            //}
+            if (st == null) {
+                System.err.println("Failed to parse syntax tree.");
+                return;
+            }
 
-            //ScopeAnalyzer scopeAnalyzer = new ScopeAnalyzer();
-            //scopeAnalyzer.analyze(st);
+            ScopeAnalyzer scopeAnalyzer = new ScopeAnalyzer();
+            scopeAnalyzer.analyze(st);
 
-            //System.out.println("Scope Analysis Completed Successfully");
+            System.out.println("Scope Analysis Completed Successfully");
 
             Scope globalScope = scopeAnalyzer.getGlobalScope();
             TypeChecker typeChecker = new TypeChecker(globalScope);
             typeChecker.typecheck(st);
 
             System.out.println("Type Checking Completed Successfully");
+
+            CodeGenIM codeGenIM = new CodeGenIM(globalScope, pt);
+            FileManager.writeIMCode("out/imcode.txt", codeGenIM.generateCode());
+
+            System.out.println("Intermediate Code Generation Completed Successfully");
 
             CodeGenBasic cgb = new CodeGenBasic(pt);
             FileManager.writeBasicCode("out/basic.bas", cgb.generateCode());
