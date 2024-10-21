@@ -7,14 +7,12 @@ import Interfaces.SyntaxTreeNode;
 import Interfaces.SymbolTableEntry;
 
 public class TypeChecker {
-    private Scope globalScope;
     private Scope currentScope;
     private SyntaxTreeNode currentFunction;
     private Map<String, Character> typeMap = new HashMap<>();
     private List<String> errors = new ArrayList<>(); // List to store error messages
 
     public TypeChecker(Scope globalScope) {
-        this.globalScope = globalScope;
         this.currentScope = globalScope;
         initializeTypeMap();
     }
@@ -621,6 +619,10 @@ public class TypeChecker {
 
         if (rhsNode.symbol == TokenType.INPUT) {
             // VNAME < input
+            if (!vnameCheck) {
+                // Error already reported in typecheck(vnameNode)
+                return false;
+            }
             if (vnameType == 'n') {
                 return true;
             } else {
@@ -631,7 +633,13 @@ public class TypeChecker {
             // VNAME = TERM
             boolean termCheck = typecheck(rhsNode);
             char termType = typeof(rhsNode);
-            if (!termCheck || vnameType != termType) {
+
+            if (!vnameCheck || !termCheck) {
+                // Errors already reported in typecheck(vnameNode) or typecheck(rhsNode)
+                return false;
+            }
+
+            if (vnameType != termType) {
                 reportError("Type mismatch in assignment to variable '" + vnameNode.value + "'");
                 return false;
             }
