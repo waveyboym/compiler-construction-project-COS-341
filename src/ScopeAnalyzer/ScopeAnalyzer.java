@@ -77,8 +77,10 @@ public class ScopeAnalyzer {
                 handleProgram(node);
                 break;
             case GLOBVARS:
+                handleGlobalVariableDeclarations(node);
+                break;
             case LOCALVARS:
-                handleVariableDeclarations(node, symbol == TokenType.GLOBVARS ? "global" : "local");
+                handleLocalVariableDeclarations(node);
                 break;
             case DECL:
                 handleFunctionDeclaration(node, false);
@@ -105,45 +107,177 @@ public class ScopeAnalyzer {
         }
     }
 
-    private void handleVariableDeclarations(SyntaxTreeNode node, String varScope) {
+    /**
+     * Handles global variable declarations.
+     */
+    private void handleGlobalVariableDeclarations(SyntaxTreeNode node) {
+        handleVariableDeclarations(node, "global");
+    }
+
+    /**
+     * Handles local variable declarations (must have exactly 3 variables with 3
+     * commas).
+     */
+    private void handleLocalVariableDeclarations(SyntaxTreeNode node) {
         if (node == null || node.children.isEmpty()) {
             return;
         }
 
         List<SyntaxTreeNode> declarations = node.children;
+        int i = 0;
+        int varCount = 0;
 
-        // Process the variable declarations
-        for (int i = 0; i < declarations.size(); i += 3) {
-            SyntaxTreeNode typeNode = declarations.get(i); // NUM or TEXT
-            SyntaxTreeNode nameNode = declarations.get(i + 1); // VNAME
+        while (i < declarations.size() && varCount < 3) {
+            SyntaxTreeNode typeNode = null;
+            SyntaxTreeNode nameNode = null;
 
-            String varType = typeNode.value; // e.g., "num", "text"
-            String varName = nameNode.value; // e.g., "V_sum"
-
-            // Remove prefix if necessary
-            if (varName != null && varName.startsWith("V_")) {
-                varName = varName.substring(2);
+            // Expecting a type node (NUM or VTEXT)
+            SyntaxTreeNode currentNode = declarations.get(i);
+            if (currentNode.symbol == TokenType.NUM || currentNode.symbol == TokenType.VTEXT) {
+                typeNode = currentNode;
+                i++;
+            } else {
+                reportError("Expected type declaration (num or text), found: " + currentNode.symbol);
+                i++;
+                continue;
             }
 
-            // Check for redeclaration
-            if (varName != null && currentScope.containsInCurrentScope(varName)) {
-                reportError("Variable '" + varName + "' is already declared in this scope.");
-            } else if (varName != null && reservedKeywords.contains(varName)) {
-                reportError("Variable name '" + varName + "' is a reserved keyword.");
-            } else if (varName != null && currentScope.lookupFunction(varName) != null) {
-                reportError("Variable name '" + varName + "' conflicts with a function name.");
-            } else if (varName != null) {
-                // Assign unique internal name
-                String uniqueName = "v" + (++variableCounter);
-
-                // Create symbol table entry
-                SymbolTableEntry entry = new SymbolTableEntry(varName, uniqueName, varType,
-                        currentScope.scopeLevel, nameNode, "variable");
-                currentScope.addSymbol(entry);
-
-                // Update the variable name in the syntax tree to the unique name
-                nameNode.value = varName;
+            // Expecting a variable name node (VNAME)
+            if (i < declarations.size()) {
+                currentNode = declarations.get(i);
+                if (currentNode.symbol == TokenType.VNAME) {
+                    nameNode = currentNode;
+                    i++;
+                } else {
+                    reportError("Expected variable name after type, found: " + currentNode.symbol);
+                    i++;
+                    continue;
+                }
+            } else {
+                reportError("Incomplete variable declaration, missing variable name.");
+                break;
             }
+
+            // Process the variable declaration
+            processVariableDeclaration(typeNode, nameNode);
+
+            varCount++;
+
+            // Expecting a comma
+            if (i < declarations.size()) {
+                currentNode = declarations.get(i);
+                if (currentNode.symbol == TokenType.COMMA) {
+                    i++;
+                    // Continue to next declaration
+                } else {
+                    reportError("Expected comma after variable declaration, found: " + currentNode.symbol);
+                    // Possibly break or continue, depending on grammar
+                }
+            }
+        }
+
+        // Check if there are more than 3 variables
+        if (varCount > 3 || varCount < 3) {
+            reportError("LOCALVARS must have exactly 3 variables.");
+        }
+    }
+
+    /**
+     * Handles variable declarations for GLOBVARS.
+     */
+    private void handleVariableDeclarations(SyntaxTreeNode node, String varScope) {
+        if (node == null || node.children.isEmpty()) {
+            return;
+        }
+
+        for (SyntaxTreeNode child : node.children) {
+            switch (child.symbol) {
+                case NUM:
+                case VTEXT:
+                    // Process the variable declaration
+                    processVariableDeclaration(node, varScope);
+                    return; // Return after processing the declaration
+                case GLOBVARS:
+                    // Recursively handle nested GLOBVARS
+                    handleVariableDeclarations(child, varScope);
+                    break;
+                default:
+                    // Skip other tokens like COMMA, SEMICOLON, etc.
+                    break;
+            }
+        }
+    }
+
+    /**
+     * Processes a single variable declaration.
+     */
+    private void processVariableDeclaration(SyntaxTreeNode typeNode, SyntaxTreeNode nameNode) {
+        String varType = typeNode.value; // e.g., "num", "text"
+        String varName = nameNode.value; // e.g., "V_sum"
+
+        // Remove prefix if necessary
+        if (varName != null && varName.startsWith("V_")) {
+            varName = varName.substring(2);
+        }
+
+        // Check for redeclaration
+        if (varName != null && currentScope.containsInCurrentScope(varName)) {
+            reportError("Variable '" + varName + "' is already declared in this scope.");
+        } else if (varName != null && reservedKeywords.contains(varName)) {
+            reportError("Variable name '" + varName + "' is a reserved keyword.");
+        } else if (varName != null && currentScope.lookupFunction(varName) != null) {
+            reportError("Variable name '" + varName + "' conflicts with a function name.");
+        } else if (varName != null) {
+            // Assign unique internal name
+            String uniqueName = "v" + (++variableCounter);
+
+            // Create symbol table entry
+            SymbolTableEntry entry = new SymbolTableEntry(varName, uniqueName, varType,
+                    currentScope.scopeLevel, nameNode, "variable");
+            currentScope.addSymbol(entry);
+
+            // Update the variable name in the syntax tree to the unique name
+            nameNode.value = varName;
+        }
+    }
+
+    /**
+     * Processes variable declarations for GLOBVARS (overloaded method).
+     */
+    private void processVariableDeclaration(SyntaxTreeNode node, String varScope) {
+        List<SyntaxTreeNode> declarations = node.children;
+
+        SyntaxTreeNode typeNode = null; // NUM or VTEXT
+        SyntaxTreeNode nameNode = null; // VNAME
+
+        // Extract type and name nodes
+        for (SyntaxTreeNode child : declarations) {
+            switch (child.symbol) {
+                case NUM:
+                case VTEXT:
+                    typeNode = child;
+                    break;
+                case VNAME:
+                    nameNode = child;
+                    break;
+                case COMMA:
+                    // Handle any nested declarations after a comma
+                    int index = declarations.indexOf(child);
+                    if (index + 1 < declarations.size()) {
+                        SyntaxTreeNode nextNode = declarations.get(index + 1);
+                        if (nextNode.symbol == TokenType.GLOBVARS) {
+                            handleVariableDeclarations(nextNode, varScope);
+                        }
+                    }
+                    break;
+                default:
+                    // Skip other tokens
+                    break;
+            }
+        }
+
+        if (typeNode != null && nameNode != null) {
+            processVariableDeclaration(typeNode, nameNode);
         }
     }
 

@@ -26,6 +26,15 @@ public class Scope {
         return symbols.containsKey(name);
     }
 
+    public Scope getChildScope(String name) {
+        for (Scope child : childScopes) {
+            if (child.scopeName.equals(name)) {
+                return child;
+            }
+        }
+        return null;
+    }
+
     public SymbolTableEntry lookup(String name) {
         SymbolTableEntry entry = symbols.get(name);
         if (entry != null) {
