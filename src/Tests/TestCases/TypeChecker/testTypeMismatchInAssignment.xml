@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PARSETREE>
+ <PROG>
+   <MAIN>
+    <ID>650314d4-ac63-4021-b209-84ce014f97ca</ID>
+    <VALUE>main</VALUE>
+   </MAIN>
+   <GLOBVARS>
+     <NUM>
+      <ID>e03af2b2-1b82-48e8-a82d-56847f8fc959</ID>
+      <VALUE>num</VALUE>
+     </NUM>
+     <VNAME>
+      <ID>62657db3-d30a-46f1-9a1f-d50bf10934fa</ID>
+      <VALUE>V_x</VALUE>
+     </VNAME>
+   </GLOBVARS>
+
+   <ALGO>
+     <BEGIN>
+      <ID>a89bc978-2ad5-43b4-8004-3f04eac4f129</ID>
+      <VALUE>begin</VALUE>
+     </BEGIN>
+     <INSTRUC>
+       <COMMAND>
+         <ASSIGN>
+           <VNAME>
+            <ID>fb181bd5-bd96-44e7-b1f8-5edeb8b3d72a</ID>
+            <VALUE>V_x</VALUE>
+           </VNAME>
+           <EQUAL_SIGN>
+            <ID>9e54ded7-cf47-4bd9-b842-1281fc488679</ID>
+            <VALUE>=</VALUE>
+           </EQUAL_SIGN>
+           <TERM>
+             <TEXTLIT>
+              <ID>f1e48acf-d788-4fdf-b488-0f6706d5ed22</ID>
+              <VALUE>Hello</VALUE>
+             </TEXTLIT>
+           </TERM>
+
+         </ASSIGN>
+
+       </COMMAND>
+
+       <SEMICOLON>
+        <ID>9358cbce-fe74-4345-a34e-aa7eb6207c34</ID>
+        <VALUE>;</VALUE>
+       </SEMICOLON>
+     </INSTRUC>
+
+     <END>
+      <ID>e3bf1baa-b118-4372-8d05-c7bec4858dec</ID>
+      <VALUE>end</VALUE>
+     </END>
+   </ALGO>
+
+   <FUNCTIONS>
+   </FUNCTIONS>
+
+ </PROG>
+</PARSETREE>

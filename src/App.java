@@ -4,13 +4,17 @@ import Interfaces.ParseNode;
 import Interfaces.SyntaxTreeNode;
 import Interfaces.Token;
 import Lexer.Lexer;
-import Parser.Parser;
-import ScopeAnalyzer.ScopeAnalyzer;
-import TypeChecker.TypeChecker;
-import Utils.FileManager;
 import Utils.Scope;
-import Utils.SyntaxTreeParser;
+import Parser.Parser;
+import Interfaces.Token;
+import Utils.FileManager;
 import Utils.XMLGenerator;
+import Interfaces.ParseNode;
+import Utils.SyntaxTreeParser;
+import TypeChecker.TypeChecker;
+import CodeGenBasic.CodeGenBasic;
+import Interfaces.SyntaxTreeNode;
+import ScopeAnalyzer.ScopeAnalyzer;
 
 import java.util.List;
 
@@ -61,19 +65,27 @@ public class App {
 
             Scope globalScope = scopeAnalyzer.getGlobalScope();
             TypeChecker typeChecker = new TypeChecker(globalScope);
-            typeChecker.typecheck(st);
+            boolean result = typeChecker.typecheck(st);
 
-            System.out.println("Type Checking Completed Successfully");
+            if (result) {
+                System.out.println("Type checking passed.");
 
             CodeGenIM codeGenIM = new CodeGenIM(globalScope, pt);
             FileManager.writeIMCode("out/imcode.txt", codeGenIM.generateCode());
 
             System.out.println("Intermediate Code Generation Completed Successfully");
 
-            CodeGenBasic cgb = new CodeGenBasic(pt);
-            FileManager.writeBasicCode("out/basic.bas", cgb.generateCode());
+                CodeGenBasic cgb = new CodeGenBasic(pt);
+                FileManager.writeBasicCode("out/basic.bas", cgb.generateCode());
 
-            System.out.println("Code Generation Completed Successfully");
+                System.out.println("Code Generation Completed Successfully");
+            } else {
+                System.out.println("Type checking failed with errors:");
+
+                for (String error : typeChecker.getErrors()) {
+                    System.out.println(error);
+                }
+            }
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
