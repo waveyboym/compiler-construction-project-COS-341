@@ -1,0 +1,6 @@
+main
+    num V_a, num V_a
+    
+    begin
+        V_a = 10;
+    end
