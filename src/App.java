@@ -1,17 +1,9 @@
 import CodeGenBasic.CodeGenBasic;
-import CodeGenIM.CodeGenIM;
 import Interfaces.ParseNode;
-import Interfaces.SyntaxTreeNode;
 import Interfaces.Token;
 import Lexer.Lexer;
 import Parser.Parser;
-import ScopeAnalyzer.ScopeAnalyzer;
-import TypeChecker.TypeChecker;
 import Utils.FileManager;
-import Utils.Scope;
-import Utils.SyntaxTreeParser;
-import Utils.XMLGenerator;
-
 import java.util.List;
 
 public class App {
@@ -41,12 +33,12 @@ public class App {
             Parser parser = new Parser(tokens);
             ParseNode pt = parser.parse();
 
-            String xmlparse = XMLGenerator.generatePARSERXML(pt);
-            FileManager.createAndWriteFile("out/parser.xml", xmlparse);
+            /*String xmlparse = XMLGenerator.generatePARSERXML(pt);
+            FileManager.createAndWriteFile("out/parser.xml", xmlparse);*/
 
             System.out.println("Parsing Completed Successfully");
 
-            SyntaxTreeParser stp = new SyntaxTreeParser();
+            /*SyntaxTreeParser stp = new SyntaxTreeParser();
             SyntaxTreeNode st = stp.parse("out/parser.xml");
 
             if (st == null) {
@@ -68,7 +60,7 @@ public class App {
             CodeGenIM codeGenIM = new CodeGenIM(globalScope, pt);
             FileManager.writeIMCode("out/imcode.txt", codeGenIM.generateCode());
 
-            System.out.println("Intermediate Code Generation Completed Successfully");
+            System.out.println("Intermediate Code Generation Completed Successfully");*/
 
             CodeGenBasic cgb = new CodeGenBasic(pt);
             FileManager.writeBasicCode("out/basic.bas", cgb.generateCode());
