@@ -37,8 +37,8 @@ public class App {
             Lexer lexer = new Lexer(contents, path);
             List<Token> tokens = lexer.scanTokens();
 
-            //String xmllex = XMLGenerator.generateLEXERXML(tokens);
-            //FileManager.createAndWriteFile("out/lexer.xml", xmllex);
+            // String xmllex = XMLGenerator.generateLEXERXML(tokens);
+            // FileManager.createAndWriteFile("out/lexer.xml", xmllex);
 
             System.out.println("Lexing Competed Successfully");
 
@@ -70,10 +70,10 @@ public class App {
             if (result) {
                 System.out.println("Type checking passed.");
 
-            CodeGenIM codeGenIM = new CodeGenIM(globalScope, pt);
-            FileManager.writeIMCode("out/imcode.txt", codeGenIM.generateCode());
+                CodeGenIM codeGenIM = new CodeGenIM(globalScope, pt);
+                FileManager.writeIMCode("out/imcode.txt", codeGenIM.generateCode());
 
-            System.out.println("Intermediate Code Generation Completed Successfully");
+                System.out.println("Intermediate Code Generation Completed Successfully");
 
                 CodeGenBasic cgb = new CodeGenBasic(pt);
                 FileManager.writeBasicCode("out/basic.bas", cgb.generateCode());
