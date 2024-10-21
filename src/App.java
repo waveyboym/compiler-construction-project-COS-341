@@ -1,19 +1,14 @@
 import CodeGenBasic.CodeGenBasic;
 import Interfaces.ParseNode;
+import Interfaces.SyntaxTreeNode;
 import Interfaces.Token;
 import Lexer.Lexer;
-import Utils.Scope;
 import Parser.Parser;
-import Interfaces.Token;
-import Utils.FileManager;
-import Utils.XMLGenerator;
-import Interfaces.ParseNode;
-import Utils.SyntaxTreeParser;
-import TypeChecker.TypeChecker;
-import CodeGenBasic.CodeGenBasic;
-import Interfaces.SyntaxTreeNode;
 import ScopeAnalyzer.ScopeAnalyzer;
-
+import TypeChecker.TypeChecker;
+import Utils.FileManager;
+import Utils.Scope;
+import Utils.SyntaxTreeParser;
 import java.util.List;
 
 public class App {
@@ -48,7 +43,7 @@ public class App {
 
             System.out.println("Parsing Completed Successfully");
 
-            /*SyntaxTreeParser stp = new SyntaxTreeParser();
+            SyntaxTreeParser stp = new SyntaxTreeParser();
             SyntaxTreeNode st = stp.parse("out/parser.xml");
 
             if (st == null) {
@@ -65,25 +60,27 @@ public class App {
             TypeChecker typeChecker = new TypeChecker(globalScope);
             boolean result = typeChecker.typecheck(st);
 
-            if (result) {
-                System.out.println("Type checking passed.");
-
-                CodeGenIM codeGenIM = new CodeGenIM(globalScope, pt);
-                FileManager.writeIMCode("out/imcode.txt", codeGenIM.generateCode());
-
-                System.out.println("Intermediate Code Generation Completed Successfully");
-
-                CodeGenBasic cgb = new CodeGenBasic(pt);
-                FileManager.writeBasicCode("out/basic.bas", cgb.generateCode());
-
-                System.out.println("Code Generation Completed Successfully");
-            } else {
-                System.out.println("Type checking failed with errors:");
+            if(!result){
+                String msg = "Type checking failed.\n";
 
                 for (String error : typeChecker.getErrors()) {
-                    System.out.println(error);
+                    msg += error + "\n";
                 }
+
+                throw new Exception(msg);
             }
+
+            System.out.println("Type checking passed.");
+
+            //CodeGenIM codeGenIM = new CodeGenIM(globalScope, pt);
+            //FileManager.writeIMCode("out/imcode.txt", codeGenIM.generateCode());
+
+            System.out.println("Intermediate Code Generation Completed Successfully");
+
+            CodeGenBasic cgb = new CodeGenBasic(pt);
+            FileManager.writeBasicCode("out/basic.bas", cgb.generateCode());
+
+            System.out.println("Code Generation Completed Successfully");
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
