@@ -1,0 +1,17 @@
+<PROG>
+    <FUNCTIONS>
+        <DECL>
+            <HEADER>
+                <FTYP>num</FTYP>
+                <FNAME>F_testFunc</FNAME>
+            </HEADER>
+            <BODY>
+                <INSTRUC>
+                    <RETURN>
+                        <CONST>T_hello</CONST>
+                    </RETURN>
+                </INSTRUC>
+            </BODY>
+        </DECL>
+    </FUNCTIONS>
+</PROG>

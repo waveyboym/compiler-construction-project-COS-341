@@ -6,6 +6,8 @@
     ],
     "cSpell.words": [
         "BINOP",
+        "BINOPCOMPOSITE",
+        "BINOPSIMPLE",
         "COMPOSIT",
         "epilog",
         "FTYP",
@@ -13,12 +15,18 @@
         "INSTRUC",
         "LOCALVARS",
         "Locvars",
+        "NULLTYPE",
+        "NUMLIT",
         "PARSETREE",
         "prolog",
         "subfuncs",
+        "TEXTLIT",
         "typecheck",
         "UNOP",
+        "UNOPCSIMPLE",
+        "UNOPSIMPLE",
         "VNAME",
+        "VTEXT",
         "vtyp"
     ]
 }

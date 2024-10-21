@@ -20,7 +20,7 @@ public class ScopeAnalyzer {
         // Initialize the global scope
         currentScope = new Scope(null, "global", 0);
 
-        // First pass: Collect function declarations
+        // First pass: Collect function declarations at the global scope
         collectFunctionDeclarations(root);
 
         // Second pass: Full scope analysis
@@ -39,14 +39,19 @@ public class ScopeAnalyzer {
         return currentScope;
     }
 
+    /**
+     * Collects function declarations in the current scope.
+     */
     private void collectFunctionDeclarations(SyntaxTreeNode node) {
-        if (node.symbol == TokenType.FUNCTIONS) {
-            for (SyntaxTreeNode child : node.children) {
-                if (child.symbol == TokenType.DECL) {
-                    handleFunctionDeclaration(child, true);
-                }
-            }
+        if (node == null) {
+            return;
+        }
+
+        if (node.symbol == TokenType.DECL) {
+            // Handle function declaration in the current scope
+            handleFunctionDeclaration(node, true);
         } else {
+            // Recurse into children nodes
             for (SyntaxTreeNode child : node.children) {
                 collectFunctionDeclarations(child);
             }
@@ -57,7 +62,14 @@ public class ScopeAnalyzer {
         return errors;
     }
 
+    /**
+     * Second pass: Traverse the syntax tree for full scope analysis.
+     */
     private void traverse(SyntaxTreeNode node) {
+        if (node == null) {
+            return;
+        }
+
         TokenType symbol = node.symbol;
 
         switch (symbol) {
@@ -65,11 +77,10 @@ public class ScopeAnalyzer {
                 handleProgram(node);
                 break;
             case GLOBVARS:
-            case LOCALVARS:
-                handleVariableDeclarations(node, symbol == TokenType.GLOBVARS ? "global" : "local");
+                handleGlobalVariableDeclarations(node);
                 break;
-            case FUNCTIONS:
-                handleFunctions(node);
+            case LOCALVARS:
+                handleLocalVariableDeclarations(node);
                 break;
             case DECL:
                 handleFunctionDeclaration(node, false);
@@ -80,10 +91,8 @@ public class ScopeAnalyzer {
             case VNAME:
                 handleVariableUsage(node);
                 break;
-            case FNAME:
-                // This might be a function usage outside of CALL
-                break;
             default:
+                // Recurse into children nodes
                 for (SyntaxTreeNode child : node.children) {
                     traverse(child);
                 }
@@ -92,78 +101,194 @@ public class ScopeAnalyzer {
     }
 
     private void handleProgram(SyntaxTreeNode node) {
+        // Traverse all children of the program node
         for (SyntaxTreeNode child : node.children) {
             traverse(child);
         }
     }
 
-    private void handleVariableDeclarations(SyntaxTreeNode node, String varScope) {
-        if (node == null) {
+    /**
+     * Handles global variable declarations.
+     */
+    private void handleGlobalVariableDeclarations(SyntaxTreeNode node) {
+        handleVariableDeclarations(node, "global");
+    }
+
+    /**
+     * Handles local variable declarations (must have exactly 3 variables with 3
+     * commas).
+     */
+    private void handleLocalVariableDeclarations(SyntaxTreeNode node) {
+        if (node == null || node.children.isEmpty()) {
             return;
         }
 
-        if (node.symbol == TokenType.GLOBVARS || node.symbol == TokenType.LOCALVARS) {
-            List<SyntaxTreeNode> declarations = node.children;
+        List<SyntaxTreeNode> declarations = node.children;
+        int i = 0;
+        int varCount = 0;
 
-            if (declarations.isEmpty()) {
-                return;
+        while (i < declarations.size() && varCount < 3) {
+            SyntaxTreeNode typeNode = null;
+            SyntaxTreeNode nameNode = null;
+
+            // Expecting a type node (NUM or VTEXT)
+            SyntaxTreeNode currentNode = declarations.get(i);
+            if (currentNode.symbol == TokenType.NUM || currentNode.symbol == TokenType.VTEXT) {
+                typeNode = currentNode;
+                i++;
+            } else {
+                reportError("Expected type declaration (num or text), found: " + currentNode.symbol);
+                i++;
+                continue;
             }
 
-            // Process the first variable declaration
-            SyntaxTreeNode typeNode = declarations.get(0); // NUM or TEXT
-            SyntaxTreeNode nameNode = declarations.get(1); // VNAME
-
-            String varType = typeNode.value; // e.g., "num", "text"
-            String varName = nameNode.value; // e.g., "V_sum"
-
-            // Remove prefix if necessary
-            if (varName != null && varName.startsWith("V_")) {
-                varName = varName.substring(2);
+            // Expecting a variable name node (VNAME)
+            if (i < declarations.size()) {
+                currentNode = declarations.get(i);
+                if (currentNode.symbol == TokenType.VNAME) {
+                    nameNode = currentNode;
+                    i++;
+                } else {
+                    reportError("Expected variable name after type, found: " + currentNode.symbol);
+                    i++;
+                    continue;
+                }
+            } else {
+                reportError("Incomplete variable declaration, missing variable name.");
+                break;
             }
 
-            // Check for redeclaration
-            if (varName != null && currentScope.containsInCurrentScope(varName)) {
-                reportError("Variable '" + varName + "' is already declared in this scope.");
-            } else if (varName != null && reservedKeywords.contains(varName)) {
-                reportError("Variable name '" + varName + "' is a reserved keyword.");
-            } else if (varName != null && currentScope.lookupFunction(varName) != null) {
-                reportError("Variable name '" + varName + "' conflicts with a function name.");
-            } else if (varName != null) {
-                // Assign unique internal name
-                String uniqueName = "v" + (++variableCounter);
+            // Process the variable declaration
+            processVariableDeclaration(typeNode, nameNode);
 
-                // Create symbol table entry
-                SymbolTableEntry entry = new SymbolTableEntry(varName, uniqueName, varType, currentScope.scopeLevel,
-                        nameNode, "variable");
-                currentScope.addSymbol(entry);
+            varCount++;
 
-                // Update the variable name in the syntax tree to the unique name
-                nameNode.value = uniqueName;
+            // Expecting a comma
+            if (i < declarations.size()) {
+                currentNode = declarations.get(i);
+                if (currentNode.symbol == TokenType.COMMA) {
+                    i++;
+                    // Continue to next declaration
+                } else {
+                    reportError("Expected comma after variable declaration, found: " + currentNode.symbol);
+                    // Possibly break or continue, depending on grammar
+                }
             }
+        }
 
-            // Now, process the rest of the variables if any
-            if (declarations.size() > 3) {
-                // Assuming the COMMA is at index 2, and GLOBVARS at index 3
-                SyntaxTreeNode restNode = declarations.get(3); // GLOBVARS
-                handleVariableDeclarations(restNode, varScope);
+        // Check if there are more than 3 variables
+        if (varCount > 3 || varCount < 3) {
+            reportError("LOCALVARS must have exactly 3 variables.");
+        }
+    }
+
+    /**
+     * Handles variable declarations for GLOBVARS.
+     */
+    private void handleVariableDeclarations(SyntaxTreeNode node, String varScope) {
+        if (node == null || node.children.isEmpty()) {
+            return;
+        }
+
+        for (SyntaxTreeNode child : node.children) {
+            switch (child.symbol) {
+                case NUM:
+                case VTEXT:
+                    // Process the variable declaration
+                    processVariableDeclaration(node, varScope);
+                    return; // Return after processing the declaration
+                case GLOBVARS:
+                    // Recursively handle nested GLOBVARS
+                    handleVariableDeclarations(child, varScope);
+                    break;
+                default:
+                    // Skip other tokens like COMMA, SEMICOLON, etc.
+                    break;
             }
         }
     }
 
-    private void handleFunctions(SyntaxTreeNode node) {
-        for (SyntaxTreeNode child : node.children) {
-            if (child.symbol == TokenType.DECL) {
-                handleFunctionDeclaration(child, false);
-            } else {
-                traverse(child);
+    /**
+     * Processes a single variable declaration.
+     */
+    private void processVariableDeclaration(SyntaxTreeNode typeNode, SyntaxTreeNode nameNode) {
+        String varType = typeNode.value; // e.g., "num", "text"
+        String varName = nameNode.value; // e.g., "V_sum"
+
+        // Remove prefix if necessary
+        if (varName != null && varName.startsWith("V_")) {
+            varName = varName.substring(2);
+        }
+
+        // Check for redeclaration
+        if (varName != null && currentScope.containsInCurrentScope(varName)) {
+            reportError("Variable '" + varName + "' is already declared in this scope.");
+        } else if (varName != null && reservedKeywords.contains(varName)) {
+            reportError("Variable name '" + varName + "' is a reserved keyword.");
+        } else if (varName != null && currentScope.lookupFunction(varName) != null) {
+            reportError("Variable name '" + varName + "' conflicts with a function name.");
+        } else if (varName != null) {
+            // Assign unique internal name
+            String uniqueName = "v" + (++variableCounter);
+
+            // Create symbol table entry
+            SymbolTableEntry entry = new SymbolTableEntry(varName, uniqueName, varType,
+                    currentScope.scopeLevel, nameNode, "variable");
+            currentScope.addSymbol(entry);
+
+            // Update the variable name in the syntax tree to the unique name
+            nameNode.value = varName;
+        }
+    }
+
+    /**
+     * Processes variable declarations for GLOBVARS (overloaded method).
+     */
+    private void processVariableDeclaration(SyntaxTreeNode node, String varScope) {
+        List<SyntaxTreeNode> declarations = node.children;
+
+        SyntaxTreeNode typeNode = null; // NUM or VTEXT
+        SyntaxTreeNode nameNode = null; // VNAME
+
+        // Extract type and name nodes
+        for (SyntaxTreeNode child : declarations) {
+            switch (child.symbol) {
+                case NUM:
+                case VTEXT:
+                    typeNode = child;
+                    break;
+                case VNAME:
+                    nameNode = child;
+                    break;
+                case COMMA:
+                    // Handle any nested declarations after a comma
+                    int index = declarations.indexOf(child);
+                    if (index + 1 < declarations.size()) {
+                        SyntaxTreeNode nextNode = declarations.get(index + 1);
+                        if (nextNode.symbol == TokenType.GLOBVARS) {
+                            handleVariableDeclarations(nextNode, varScope);
+                        }
+                    }
+                    break;
+                default:
+                    // Skip other tokens
+                    break;
             }
+        }
+
+        if (typeNode != null && nameNode != null) {
+            processVariableDeclaration(typeNode, nameNode);
         }
     }
 
     private void handleFunctionDeclaration(SyntaxTreeNode node, boolean firstPass) {
+        if (node == null) {
+            return;
+        }
+
         // Extract HEADER and BODY
-        SyntaxTreeNode bodyNode = null;
         SyntaxTreeNode headerNode = null;
+        SyntaxTreeNode bodyNode = null;
 
         for (SyntaxTreeNode child : node.children) {
             if (child.symbol == TokenType.HEADER) {
@@ -201,79 +326,80 @@ public class ScopeAnalyzer {
             return;
         }
 
-        // Check for redeclaration in current scope
-        if (currentScope.containsInCurrentScope(funcName)) {
-            reportError("Function '" + funcName + "' is already declared in this scope.");
-        } else if (reservedKeywords.contains(funcName)) {
-            reportError("Function name '" + funcName + "' is a reserved keyword.");
-        } else if (currentScope.lookup(funcName) != null) {
-            reportError("Function name '" + funcName + "' conflicts with a variable or function name.");
-        } else if (funcName.equals(currentScope.scopeName)) {
-            reportError("Function name '" + funcName + "' is the same as its parent scope name.");
-        } else if (currentScope.hasSiblingScope(funcName)) {
-            reportError("Function name '" + funcName + "' is the same as one of its sibling scopes.");
+        if (firstPass) {
+            // First pass: Register the function in the current scope
+            if (currentScope.containsInCurrentScope(funcName)) {
+                reportError("Function '" + funcName + "' is already declared in this scope.");
+            } else if (reservedKeywords.contains(funcName)) {
+                reportError("Function name '" + funcName + "' is a reserved keyword.");
+            } else if (currentScope.lookup(funcName) != null) {
+                reportError("Function name '" + funcName + "' conflicts with a variable or function name.");
+            } else {
+                // Assign unique internal name
+                String uniqueName = "f" + (++functionCounter);
+
+                // Create symbol table entry
+                SymbolTableEntry entry = new SymbolTableEntry(funcName, uniqueName, funcType,
+                        currentScope.scopeLevel, node, "function");
+                currentScope.addSymbol(entry);
+
+                // Update the function name in the syntax tree to the unique name
+                for (SyntaxTreeNode child : headerNode.children) {
+                    if (child.symbol == TokenType.FNAME) {
+                        child.value = funcName;
+                        break;
+                    }
+                }
+            }
         } else {
-            // Assign unique internal name
-            String uniqueName = "f" + (++functionCounter);
+            // Second pass: Process the function body
 
-            // Create symbol table entry
-            SymbolTableEntry entry = new SymbolTableEntry(funcName, uniqueName, funcType, currentScope.scopeLevel, node,
-                    "function");
-            currentScope.addSymbol(entry);
+            // Retrieve the function's symbol table entry
+            SymbolTableEntry entry = currentScope.lookup(funcName);
+            if (entry == null) {
+                reportError("Function '" + funcName + "' was not registered in the first pass.");
+                return;
+            }
 
-            // Update the function name in the syntax tree to the unique name
-            for (SyntaxTreeNode child : headerNode.children) {
-                if (child.symbol == TokenType.FNAME) {
-                    child.value = uniqueName;
-                    break;
+            // Enter new function scope
+            Scope functionScope = new Scope(currentScope, funcName, currentScope.scopeLevel + 1);
+            currentScope = functionScope;
+
+            // Collect function declarations in the new scope (nested functions)
+            collectFunctionDeclarations(bodyNode);
+
+            // Handle function parameters (treated as local variables)
+            for (SyntaxTreeNode paramNode : params) {
+                String paramName = paramNode.value;
+                if (paramName != null && paramName.startsWith("V_")) {
+                    paramName = paramName.substring(2);
+                }
+
+                if (currentScope.containsInCurrentScope(paramName)) {
+                    reportError("Parameter '" + paramName + "' is already declared in this scope.");
+                } else if (reservedKeywords.contains(paramName)) {
+                    reportError("Parameter name '" + paramName + "' is a reserved keyword.");
+                } else {
+                    // Assign unique internal name
+                    String uniqueParamName = "v" + (++variableCounter);
+
+                    // Create symbol table entry
+                    SymbolTableEntry paramEntry = new SymbolTableEntry(paramName, uniqueParamName, "param",
+                            currentScope.scopeLevel, paramNode, "variable");
+                    currentScope.addSymbol(paramEntry);
+
+                    // Update the parameter name in the syntax tree to the unique name
+                    paramNode.value = paramName;
                 }
             }
 
-            if (!firstPass) {
-                // Enter new function scope
-                Scope functionScope = new Scope(currentScope, funcName, currentScope.scopeLevel + 1);
-                currentScope = functionScope;
-
-                // Handle function parameters (treated as local variables)
-                for (SyntaxTreeNode paramNode : params) {
-                    String paramName = paramNode.value;
-                    if (paramName != null && paramName.startsWith("V_")) {
-                        paramName = paramName.substring(2);
-                    }
-
-                    if (currentScope.containsInCurrentScope(paramName)) {
-                        reportError("Parameter '" + paramName + "' is already declared in this scope.");
-                    } else if (reservedKeywords.contains(paramName)) {
-                        reportError("Parameter name '" + paramName + "' is a reserved keyword.");
-                    } else {
-                        // Assign unique internal name
-                        String uniqueParamName = "v" + (++variableCounter);
-
-                        // Create symbol table entry
-                        SymbolTableEntry paramEntry = new SymbolTableEntry(paramName, uniqueParamName, "param",
-                                currentScope.scopeLevel, paramNode, "variable");
-                        currentScope.addSymbol(paramEntry);
-
-                        // Update the parameter name in the syntax tree to the unique name
-                        paramNode.value = uniqueParamName;
-                    }
-                }
-
-                // Handle local variables in LOCVARS
-                for (SyntaxTreeNode child : bodyNode.children) {
-                    if (child.symbol == TokenType.LOCALVARS) {
-                        handleVariableDeclarations(child, "local");
-                    }
-                }
-
-                // Traverse the function body
-                for (SyntaxTreeNode child : bodyNode.children) {
-                    traverse(child);
-                }
-
-                // Exit function scope
-                currentScope = currentScope.parent;
+            // Traverse the function body
+            for (SyntaxTreeNode child : bodyNode.children) {
+                traverse(child);
             }
+
+            // Exit function scope
+            currentScope = currentScope.parent;
         }
     }
 
@@ -290,7 +416,7 @@ public class ScopeAnalyzer {
             reportError("Variable '" + varName + "' is not declared.");
         } else {
             // Replace the name with the unique internal name
-            node.value = entry.uniqueName;
+            node.value = entry.originalName;
         }
     }
 
@@ -312,7 +438,7 @@ public class ScopeAnalyzer {
                     reportError("Function '" + funcName + "' is not declared.");
                 } else {
                     // Replace the name with the unique internal name
-                    child.value = entry.uniqueName;
+                    child.value = entry.originalName;
                 }
 
                 // Check for recursive call to main
