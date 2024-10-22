@@ -1,0 +1,16 @@
+main
+    num V_a
+    
+    begin
+        V_a = 5;
+        F_func(1, 2, 3);
+    end
+
+    void F_func(V_b, V_c, V_d) {
+        num V_x, num V_y, num V_z,
+
+        begin
+            print V_a;
+        end
+    }
+    end

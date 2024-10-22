@@ -1,0 +1,6 @@
+main
+    num V_halt
+    
+    begin
+        V_halt = 10;
+    end

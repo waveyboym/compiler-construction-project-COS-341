@@ -1,0 +1,4 @@
+main
+    begin
+        print V_y;
+    end

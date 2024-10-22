@@ -309,7 +309,7 @@ public class ScopeAnalyzer {
         List<SyntaxTreeNode> params = new ArrayList<>();
 
         for (SyntaxTreeNode child : headerNode.children) {
-            if (child.symbol == TokenType.NUM || child.symbol == TokenType.TEXT || child.symbol == TokenType.VOID) {
+            if (child.symbol == TokenType.NUM || child.symbol == TokenType.TEXT || child.symbol == TokenType.FVOID) {
                 funcType = child.value;
             } else if (child.symbol == TokenType.FNAME) {
                 funcName = child.value;
