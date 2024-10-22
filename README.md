@@ -28,6 +28,9 @@ compiler-windows.exe input/main.spl
 //unix
 ./compiler-unix input/main.spl
 ```
+4. Use this website to execute the basic code <a href="https://www.jdoodle.com/execute-yabasic-online">basic compiler</a>
+> [!NOTE]  
+> We made use of YABASIC and as such our syntax follows YABASIC dialect
 
 ## I am feeling brave and I don't trust you
 > [!WARNING]  
@@ -44,6 +47,9 @@ compiler-windows.exe input/main.spl
 ```
 java -jar compiler-1.0-SNAPSHOT.jar input/main.spl
 ```
+3. Use this website to execute the basic code <a href="https://www.jdoodle.com/execute-yabasic-online">basic compiler</a>
+> [!NOTE]  
+> We made use of YABASIC and as such our syntax follows YABASIC dialect
 
 #### Run scripts
 1. if you are on windows, open a terminal and run:
@@ -54,6 +60,10 @@ otherwise if you are on linux, run:
 ```
 ./run.sh
 ```
+2. Use this website to execute the basic code <a href="https://www.jdoodle.com/execute-yabasic-online">basic compiler</a>
+> [!NOTE]  
+> We made use of YABASIC and as such our syntax follows YABASIC dialect
+> 
 > [!NOTE]  
 > You may have to grant run permissions to the bash or bat files
 
