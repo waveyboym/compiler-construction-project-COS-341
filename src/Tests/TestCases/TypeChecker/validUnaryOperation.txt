@@ -1,0 +1,6 @@
+main
+    num V_result
+    
+    begin
+        V_result = sqrt(16);
+    end

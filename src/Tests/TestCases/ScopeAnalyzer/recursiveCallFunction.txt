@@ -7,7 +7,15 @@ main
         num V_x, num V_y, num V_z,
 
         begin
-            if eq(V_a, 0) then halt else F_recursive(sub(V_a, 1), V_b, V_c);
+            if eq(V_a, 0)
+            then
+                begin
+                    halt
+                end
+            else
+                begin
+                    F_recursive(V_a, V_b, V_c);
+                end
         end
     }
     end

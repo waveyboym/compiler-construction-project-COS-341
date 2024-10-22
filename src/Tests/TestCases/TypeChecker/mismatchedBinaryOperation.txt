@@ -1,0 +1,6 @@
+main
+    num V_result
+
+    begin
+        V_result = add("Hello", 3);
+    end

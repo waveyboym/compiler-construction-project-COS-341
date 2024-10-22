@@ -1,6 +1,13 @@
 package Tests;
 
 import Utils.Scope;
+import Lexer.Lexer;
+import Parser.Parser;
+import java.util.List;
+import Interfaces.Token;
+import Utils.FileManager;
+import Utils.XMLGenerator;
+import Interfaces.ParseNode;
 import Utils.SyntaxTreeParser;
 import TypeChecker.TypeChecker;
 import Interfaces.SyntaxTreeNode;
@@ -15,291 +22,70 @@ public class TypeCheckerTest {
     public static void main(String[] args) {
         System.out.println("Running TypeChecker tests...");
 
-        testCorrectlyTypedCode();
-        testTypeMismatchInAssignment();
-        testFunctionReturnTypeMismatch();
-        testCorrectFunctionCall();
-        testFunctionCallIncorrectParams();
-        testUndeclaredVariableUsage();
-        testSampleProgram();
-        // Add more test methods as needed.
+        runTest("validNumericAssignment.txt", true, null);
+        runTest("invalidStringToNumericAssignment.txt", false, "Type mismatch in assignment to variable 'V_x'");
+        runTest("validFunctionReturn.txt", true, null);
+        runTest("invalidReturnType.txt", false, "Return type mismatch: Expected 'n', found 't'");
+        runTest("numericInputAssignment.txt", true, null);
+        runTest("invalidTextInputAssignment.txt", false, "Input can only be assigned to variables of type 'num'");
+        runTest("validBinaryOperation.txt", true, null);
+        runTest("mismatchedBinaryOperation.txt", false, "Type mismatch in binary operation");
+        runTest("validConditionalBranch.txt", true, null);
+        runTest("invalidConditionalBranch.txt", false, "Condition in if statement must be boolean");
+        runTest("validFunctionCall.txt", true, null);
+        runTest("invalidFunctionCall.txt", false, "Function arguments must be of type 'num'");
+        runTest("validUnaryOperation.txt", true, null);
+        runTest("invalidUnaryOperation.txt", false, "Type mismatch in unary operation");
 
         System.out.println("Tests passed: " + testsPassed + "/" + totalTests);
         System.out.println("Tests failed: " + testsFailed + "/" + totalTests);
         System.out.println("Total tests: " + totalTests);
     }
 
-    /**
-     * Test: Correctly typed code should pass the type checker.
-     */
-    public static void testCorrectlyTypedCode() {
-        String testName = "testCorrectlyTypedCode";
-        totalTests++;
+    private static SyntaxTreeNode getSyntaxTree(String fileName) {
+        String contents = FileManager.readFileAndReturnContents("src/Tests/TestCases/TypeChecker/" + fileName);
 
-        try {
-            // Parse the XML to obtain the syntax tree
-            SyntaxTreeParser parser = new SyntaxTreeParser();
-            SyntaxTreeNode root = parser.parse("src/Tests/TestCases/TypeChecker/testCorrectlyTypedCode.xml");
+        Lexer lexer = new Lexer(contents, "path");
+        List<Token> tokens = lexer.scanTokens();
 
-            ScopeAnalyzer scopeAnalyzer = new ScopeAnalyzer();
-            scopeAnalyzer.analyze(root);
+        Parser parser = new Parser(tokens);
+        ParseNode pt = parser.parse();
 
-            Scope globalScope = scopeAnalyzer.getGlobalScope();
+        String xml = XMLGenerator.generatePARSERXML(pt);
+        FileManager.createAndWriteFile("src/Tests/TestCases/TypeChecker/type.xml", xml);
 
-            // Create the TypeChecker
-            TypeChecker typeChecker = new TypeChecker(globalScope);
-
-            // Perform type checking
-            boolean result = typeChecker.typecheck(root);
-
-            // Assert that the type checking succeeds
-            if (result) {
-                System.out.println("\u001B[32m[PASS]\u001B[0m " + testName);
-                testsPassed++;
-            } else {
-                System.out.println("\u001B[31m[FAIL]\u001B[0m " + testName + ": Expected type checking to pass.");
-                testsFailed++;
-            }
-        } catch (Exception e) {
-            System.out.println("\u001B[31m[FAIL]\u001B[0m " + testName + ": Exception occurred.");
-            e.printStackTrace();
-            testsFailed++;
-        }
+        SyntaxTreeParser stp = new SyntaxTreeParser();
+        return stp.parse("src/Tests/TestCases/TypeChecker/type.xml");
     }
 
-    /**
-     * Test: Type mismatch in assignment should fail the type checker.
-     */
-    public static void testTypeMismatchInAssignment() {
-        String testName = "testTypeMismatchInAssignment";
+    private static void runTest(String fileName, boolean expectedResult, String expectedError) {
         totalTests++;
-
         try {
-            // Parse the XML to obtain the syntax tree
-            SyntaxTreeParser parser = new SyntaxTreeParser();
-            SyntaxTreeNode root = parser.parse("src/Tests/TestCases/TypeChecker/testTypeMismatchInAssignment.xml");
+            SyntaxTreeNode root = getSyntaxTree(fileName);
 
             ScopeAnalyzer scopeAnalyzer = new ScopeAnalyzer();
             scopeAnalyzer.analyze(root);
 
             Scope globalScope = scopeAnalyzer.getGlobalScope();
-
-            // Create the TypeChecker
             TypeChecker typeChecker = new TypeChecker(globalScope);
-
-            // Perform type checking
             boolean result = typeChecker.typecheck(root);
 
-            // Assert that the type checking fails
-            if (!result) {
-                System.out.println("\u001B[32m[PASS]\u001B[0m " + testName);
-                testsPassed++;
+            if (result == expectedResult) {
+                if (expectedError == null || typeChecker.getErrors().contains(expectedError)) {
+                    System.out.println("\u001B[32m[PASS]\u001B[0m " + fileName);
+                    testsPassed++;
+                } else {
+                    System.out.println("\u001B[31m[FAIL]\u001B[0m " + fileName +
+                            ": Expected error not found.");
+                    testsFailed++;
+                }
             } else {
-                System.out.println("\u001B[31m[FAIL]\u001B[0m " + testName + ": Expected type checking to fail.");
+                System.out.println("\u001B[31m[FAIL]\u001B[0m " + fileName +
+                        ": Expected " + expectedResult);
                 testsFailed++;
             }
         } catch (Exception e) {
-            System.out.println("\u001B[31m[FAIL]\u001B[0m " + testName + ": Exception occurred.");
-            e.printStackTrace();
-            testsFailed++;
-        }
-    }
-
-    /**
-     * Test: Function return type mismatch should fail the type checker.
-     */
-    public static void testFunctionReturnTypeMismatch() {
-        String testName = "testFunctionReturnTypeMismatch";
-        totalTests++;
-
-        try {
-            // Parse the XML to obtain the syntax tree
-            SyntaxTreeParser parser = new SyntaxTreeParser();
-            SyntaxTreeNode root = parser.parse("src/Tests/TestCases/TypeChecker/testFunctionReturnTypeMismatch.xml");
-
-            ScopeAnalyzer scopeAnalyzer = new ScopeAnalyzer();
-            scopeAnalyzer.analyze(root);
-
-            Scope globalScope = scopeAnalyzer.getGlobalScope();
-
-            // Create the TypeChecker
-            TypeChecker typeChecker = new TypeChecker(globalScope);
-
-            // Perform type checking
-            boolean result = typeChecker.typecheck(root);
-
-            // Assert that the type checking fails
-            if (!result) {
-                System.out.println("\u001B[32m[PASS]\u001B[0m " + testName);
-                testsPassed++;
-            } else {
-                System.out.println(
-                        "\u001B[31m[FAIL]\u001B[0m " + testName
-                                + ": Expected type checking to fail due to return type mismatch.");
-                testsFailed++;
-            }
-        } catch (Exception e) {
-            System.out.println("\u001B[31m[FAIL]\u001B[0m " + testName + ": Exception occurred.");
-            e.printStackTrace();
-            testsFailed++;
-        }
-    }
-
-    /**
-     * Test: Correct function call with numeric parameters should pass the type
-     * checker.
-     */
-    public static void testCorrectFunctionCall() {
-        String testName = "testCorrectFunctionCall";
-        totalTests++;
-
-        try {
-            // Parse the XML to obtain the syntax tree
-            SyntaxTreeParser parser = new SyntaxTreeParser();
-            SyntaxTreeNode root = parser.parse("src/Tests/TestCases/TypeChecker/testCorrectFunctionCall.xml");
-
-            ScopeAnalyzer scopeAnalyzer = new ScopeAnalyzer();
-            scopeAnalyzer.analyze(root);
-
-            Scope globalScope = scopeAnalyzer.getGlobalScope();
-
-            // Create the TypeChecker
-            TypeChecker typeChecker = new TypeChecker(globalScope);
-
-            // Perform type checking
-            boolean result = typeChecker.typecheck(root);
-
-            // Assert that the type checking succeeds
-            if (result) {
-                System.out.println("\u001B[32m[PASS]\u001B[0m " + testName);
-                testsPassed++;
-            } else {
-                System.out.println(
-                        "\u001B[31m[FAIL]\u001B[0m " + testName + ": Expected type checking to pass.");
-                testsFailed++;
-            }
-        } catch (Exception e) {
-            System.out.println("\u001B[31m[FAIL]\u001B[0m " + testName + ": Exception occurred.");
-            e.printStackTrace();
-            testsFailed++;
-        }
-    }
-
-    /**
-     * Test: Function call with incorrect parameter types should fail the type
-     * checker.
-     */
-    public static void testFunctionCallIncorrectParams() {
-        String testName = "testFunctionCallIncorrectParams";
-        totalTests++;
-
-        try {
-            // Parse the XML to obtain the syntax tree
-            SyntaxTreeParser parser = new SyntaxTreeParser();
-            SyntaxTreeNode root = parser.parse("src/Tests/TestCases/TypeChecker/testFunctionCallIncorrectParams.xml");
-
-            ScopeAnalyzer scopeAnalyzer = new ScopeAnalyzer();
-            scopeAnalyzer.analyze(root);
-
-            Scope globalScope = scopeAnalyzer.getGlobalScope();
-
-            // Create the TypeChecker
-            TypeChecker typeChecker = new TypeChecker(globalScope);
-
-            // Perform type checking
-            boolean result = typeChecker.typecheck(root);
-
-            // Assert that the type checking fails
-            if (!result) {
-                System.out.println("\u001B[32m[PASS]\u001B[0m " + testName);
-                testsPassed++;
-            } else {
-                System.out.println(
-                        "\u001B[31m[FAIL]\u001B[0m " + testName
-                                + ": Expected type checking to fail due to incorrect parameters.");
-                testsFailed++;
-            }
-        } catch (Exception e) {
-            System.out.println("\u001B[31m[FAIL]\u001B[0m " + testName + ": Exception occurred.");
-            e.printStackTrace();
-            testsFailed++;
-        }
-    }
-
-    /**
-     * Test: Using an undeclared variable should fail the type checker.
-     */
-    public static void testUndeclaredVariableUsage() {
-        String testName = "testUndeclaredVariableUsage";
-        totalTests++;
-
-        try {
-            // Parse the XML to obtain the syntax tree
-            SyntaxTreeParser parser = new SyntaxTreeParser();
-            SyntaxTreeNode root = parser.parse("src/Tests/TestCases/TypeChecker/testUndeclaredVariableUsage.xml");
-
-            ScopeAnalyzer scopeAnalyzer = new ScopeAnalyzer();
-            scopeAnalyzer.analyze(root);
-
-            Scope globalScope = scopeAnalyzer.getGlobalScope();
-
-            // Create the TypeChecker
-            TypeChecker typeChecker = new TypeChecker(globalScope);
-
-            // Perform type checking
-            boolean result = typeChecker.typecheck(root);
-
-            // Assert that the type checking fails
-            if (!result) {
-                System.out.println("\u001B[32m[PASS]\u001B[0m " + testName);
-                testsPassed++;
-            } else {
-                System.out.println(
-                        "\u001B[31m[FAIL]\u001B[0m " + testName
-                                + ": Expected type checking to fail due to undeclared variable.");
-                testsFailed++;
-            }
-        } catch (Exception e) {
-            System.out.println("\u001B[31m[FAIL]\u001B[0m " + testName + ": Exception occurred.");
-            e.printStackTrace();
-            testsFailed++;
-        }
-    }
-
-    /**
-     * Test: Sample program should pass the type checker.
-     */
-    public static void testSampleProgram() {
-        String testName = "testSampleProgram";
-        totalTests++;
-
-        try {
-            // Parse the XML to obtain the syntax tree
-            SyntaxTreeParser parser = new SyntaxTreeParser();
-            SyntaxTreeNode root = parser.parse("src/Tests/TestCases/TypeChecker/testSampleProgram.xml");
-
-            ScopeAnalyzer scopeAnalyzer = new ScopeAnalyzer();
-            scopeAnalyzer.analyze(root);
-
-            Scope globalScope = scopeAnalyzer.getGlobalScope();
-
-            // Create the TypeChecker
-            TypeChecker typeChecker = new TypeChecker(globalScope);
-
-            // Perform type checking
-            boolean result = typeChecker.typecheck(root);
-
-            // Assert that the type checking succeeds
-            if (result) {
-                System.out.println("\u001B[32m[PASS]\u001B[0m " + testName);
-                testsPassed++;
-            } else {
-                System.out.println(
-                        "\u001B[31m[FAIL]\u001B[0m " + testName + ": Expected type checking to pass.");
-                testsFailed++;
-            }
-        } catch (Exception e) {
-            System.out.println("\u001B[31m[FAIL]\u001B[0m " + testName + ": Exception occurred.");
+            System.out.println("\u001B[31m[FAIL]\u001B[0m " + fileName + ": Exception occurred.");
             e.printStackTrace();
             testsFailed++;
         }
