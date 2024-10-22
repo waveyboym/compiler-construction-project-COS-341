@@ -14,22 +14,22 @@ if [ $? -eq 0 ]; then
     # cd up to root directory
     # Ask user for input file from root directory
     echo "Enter input file path: "
+    read input
 
     # check if input file exists
-    if [ ! -f $input ]; then
+    if [ -f $input ]; then
+        # Copy input file to bin directory
+        cp $input bin
+        # cd into bin directory
+        cd bin
+        # Run the Java program
+        java App < $input
+        # Remove .class files after execution
+        del /s *.class
+    else
         echo "File not found"
         exit 1
     fi
-    
-    read input
-    # Copy input file to bin directory
-    cp $input bin
-    # cd into bin directory
-    cd bin
-    # Run the Java program
-    java App < $input
-    # Remove .class files after execution
-    del /s *.class
 else
     echo "Compilation failed"
 fi
