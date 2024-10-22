@@ -9,6 +9,7 @@ import TypeChecker.TypeChecker;
 import Utils.FileManager;
 import Utils.Scope;
 import Utils.SyntaxTreeParser;
+import Utils.XMLGenerator;
 import java.util.List;
 
 public class App {
@@ -30,16 +31,16 @@ public class App {
             Lexer lexer = new Lexer(contents, path);
             List<Token> tokens = lexer.scanTokens();
 
-            // String xmllex = XMLGenerator.generateLEXERXML(tokens);
-            // FileManager.createAndWriteFile("out/lexer.xml", xmllex);
+            String xmllex = XMLGenerator.generateLEXERXML(tokens);
+            FileManager.createAndWriteFile("out/lexer.xml", xmllex);
 
             System.out.println("Lexing Competed Successfully");
 
             Parser parser = new Parser(tokens);
             ParseNode pt = parser.parse();
 
-            /*String xmlparse = XMLGenerator.generatePARSERXML(pt);
-            FileManager.createAndWriteFile("out/parser.xml", xmlparse);*/
+            String xmlparse = XMLGenerator.generatePARSERXML(pt);
+            FileManager.createAndWriteFile("out/parser.xml", xmlparse);
 
             System.out.println("Parsing Completed Successfully");
 
@@ -74,8 +75,8 @@ public class App {
 
             //CodeGenIM codeGenIM = new CodeGenIM(globalScope, pt);
             //FileManager.writeIMCode("out/imcode.txt", codeGenIM.generateCode());
-
-            System.out.println("Intermediate Code Generation Completed Successfully");
+            // bro it doesn't even run lol
+            //System.out.println("Intermediate Code Generation Completed Successfully");
 
             CodeGenBasic cgb = new CodeGenBasic(pt);
             FileManager.writeBasicCode("out/basic.bas", cgb.generateCode());

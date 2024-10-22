@@ -29,8 +29,6 @@ public class CodeGenBasic {
         // ALGO
         sb.append(generateBasicAlgo(pt.children.get(2), ""));
 
-        sb.append(Line()).append("\n");
-
         // FUNCTIONS
         sb.append(generateBasicFunctions(pt.children.get(3), ""));
 
@@ -76,9 +74,11 @@ public class CodeGenBasic {
         if(functions.children.isEmpty()){
             return "";
         }
-
+        
         StringBuilder sb = new StringBuilder();
 
+        sb.append(Line()).append("\n");
+        
         sb.append(generateBasicDecl(functions.children.get(0), indent));
 
         if(functions.children.size() > 1){
@@ -131,11 +131,11 @@ public class CodeGenBasic {
 
         sb.append(generateBasicAlgo(body.children.get(2), indent + "\t"));
 
-        if(body.children.get(4).token == null){
-            sb.append(Line()).append(" ").append(generateBasicFunctions(body.children.get(4), indent + "\t"));
-        }
+        sb.append(Line()).append(indent).append(" ").append("END SUB\n");
 
-        sb.append(Line()).append(" ").append("END SUB\n");
+        if(body.children.get(4).token == null){
+            sb.append(generateBasicFunctions(body.children.get(4), indent));
+        }
 
         return sb.toString();
     }
