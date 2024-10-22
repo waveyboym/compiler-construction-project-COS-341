@@ -11,6 +11,7 @@
         "COMPOSIT",
         "epilog",
         "FTYP",
+        "FVOID",
         "GLOBVARS",
         "INSTRUC",
         "LOCALVARS",
@@ -27,6 +28,8 @@
         "UNOPSIMPLE",
         "VNAME",
         "VTEXT",
-        "vtyp"
-    ]
+        "vtyp",
+        "xmlparse"
+    ],
+    "java.configuration.updateBuildConfiguration": "interactive"
 }
