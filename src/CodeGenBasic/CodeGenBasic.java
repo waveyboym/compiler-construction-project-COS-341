@@ -1,13 +1,25 @@
 package CodeGenBasic;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import Interfaces.ParseNode;
 import Interfaces.ParseType;
 import Interfaces.TokenType;
 
+class SymbolTables{
+    public HashMap<String, String> numvtable = new HashMap<>();
+    public HashMap<String, String> textvtable = new HashMap<>();
+    public List<String> ftableArgs = new ArrayList<>();
+    public HashMap<String, String> fnumvtable = new HashMap<>();
+    public HashMap<String, String> ftextvtable = new HashMap<>();
+}
+
 public class CodeGenBasic {
     ParseNode pt;
     int line = 0;
-    // I would have the vtable and ftable here
+    SymbolTables st = new SymbolTables();
 
     public CodeGenBasic(ParseNode pt) {
         this.pt = pt;
@@ -51,8 +63,22 @@ public class CodeGenBasic {
         if(null == vtype.token.type){
             throw new IllegalArgumentException("Unexpected value: " + vtype.token.type);
         } else switch (vtype.token.type) {
-            case NUM -> sb.append(Line()).append(indent).append(" LET ").append(vname.token.Value).append(" = 0\n");
-            case VTEXT -> sb.append(Line()).append(indent).append(" LET ").append(vname.token.Value).append(" = \"\"\n");
+            case NUM -> {
+                sb.append(Line()).append(indent).append(" LET ").append(vname.token.Value).append(" = 0\n");
+                // ensure that the variable is not already declared
+                if(st.numvtable.containsKey(vname.token.Value)){
+                    throw new IllegalArgumentException("Variable " + vname.token.Value + " already declared");
+                }
+                st.numvtable.put(vname.token.Value, vname.token.Value);
+            }
+            case VTEXT -> {
+                sb.append(Line()).append(indent).append(" LET ").append(vname.token.Value).append("$ = \"\"\n");
+                // ensure that the variable is not already declared
+                if(st.textvtable.containsKey(vname.token.Value)){
+                    throw new IllegalArgumentException("Variable " + vname.token.Value + " already declared");
+                }
+                st.textvtable.put(vname.token.Value, vname.token.Value);
+            }
             default -> throw new IllegalArgumentException("Unexpected value: " + vtype.token.type);
         }
 
@@ -108,10 +134,13 @@ public class CodeGenBasic {
         sb.append(header.children.get(1).token.Value);
         sb.append("(");
         sb.append(header.children.get(3).token.Value);
+        st.ftableArgs.add(header.children.get(3).token.Value);
         sb.append(", ");
         sb.append(header.children.get(5).token.Value);
+        st.ftableArgs.add(header.children.get(5).token.Value);
         sb.append(", ");
         sb.append(header.children.get(7).token.Value);
+        st.ftableArgs.add(header.children.get(7).token.Value);
         sb.append(")\n");
 
         return sb.toString();
@@ -133,6 +162,10 @@ public class CodeGenBasic {
 
         sb.append(Line()).append(indent).append(" ").append("END SUB\n");
 
+        st.ftableArgs.clear();
+        st.fnumvtable.clear();
+        st.ftextvtable.clear();
+
         if(body.children.get(4).token == null){
             sb.append(generateBasicFunctions(body.children.get(4), indent));
         }
@@ -146,10 +179,25 @@ public class CodeGenBasic {
         StringBuilder sb = new StringBuilder();
 
         sb.append(" LOCAL ");
+        if(locvars.children.get(0).token.type == TokenType.NUM){
+            st.fnumvtable.put(locvars.children.get(1).token.Value, locvars.children.get(1).token.Value);
+        } else if(locvars.children.get(0).token.type == TokenType.VTEXT){
+            st.ftextvtable.put(locvars.children.get(1).token.Value, locvars.children.get(1).token.Value);
+        }
         sb.append(locvars.children.get(1).token.Value);
         sb.append(", ");
+        if(locvars.children.get(3).token.type == TokenType.NUM){
+            st.fnumvtable.put(locvars.children.get(4).token.Value, locvars.children.get(4).token.Value);
+        } else if(locvars.children.get(3).token.type == TokenType.VTEXT){
+            st.ftextvtable.put(locvars.children.get(4).token.Value, locvars.children.get(4).token.Value);
+        }
         sb.append(locvars.children.get(4).token.Value);
         sb.append(", ");
+        if(locvars.children.get(6).token.type == TokenType.NUM){
+            st.fnumvtable.put(locvars.children.get(7).token.Value, locvars.children.get(7).token.Value);
+        } else if(locvars.children.get(6).token.type == TokenType.VTEXT){
+            st.ftextvtable.put(locvars.children.get(7).token.Value, locvars.children.get(7).token.Value);
+        }
         sb.append(locvars.children.get(7).token.Value);
         sb.append("\n");
 
@@ -439,7 +487,15 @@ public class CodeGenBasic {
     private String generateBasicVname(ParseNode vname){
         // expected: VNAME := ID
         // equivalent BASIC syntax code: ID
-        return vname.children.get(0).token.Value;
+        // ensure that the variable is declared
+        // f-args will always be of type NUM
+        if(st.numvtable.containsKey(vname.children.get(0).token.Value) || st.fnumvtable.containsKey(vname.children.get(0).token.Value) || st.ftableArgs.contains(vname.children.get(0).token.Value)){
+            return vname.children.get(0).token.Value;
+        } else if(st.textvtable.containsKey(vname.children.get(0).token.Value) || st.ftextvtable.containsKey(vname.children.get(0).token.Value)){
+            return vname.children.get(0).token.Value + "$";
+        } else {
+            throw new IllegalArgumentException("Variable " + vname.children.get(0).token.Value + " not declared");
+        }
     }
 
     private String geneareBasicConst(ParseNode constant){

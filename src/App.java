@@ -1,3 +1,5 @@
+import java.util.List;
+
 import CodeGenBasic.CodeGenBasic;
 import Interfaces.ParseNode;
 import Interfaces.SyntaxTreeNode;
@@ -10,7 +12,6 @@ import Utils.FileManager;
 import Utils.Scope;
 import Utils.SyntaxTreeParser;
 import Utils.XMLGenerator;
-import java.util.List;
 
 public class App {
     public static void main(String[] args) throws Exception {
