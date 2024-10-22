@@ -1,0 +1,7 @@
+main
+    begin
+        if 5 then
+            print "True";
+        else
+            print "False";
+    end

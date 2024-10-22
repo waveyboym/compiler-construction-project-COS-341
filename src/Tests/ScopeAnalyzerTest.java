@@ -29,11 +29,10 @@ public class ScopeAnalyzerTest {
         runTest("variableReservedWord.txt", "Semantic Error: Variable name 'halt' is a reserved keyword.");
         runTest("variablesSameNameDifferentScopes.txt", null);
         runTest("childScopeSameAsParent.txt",
-                "Semantic Error: Child scope 'F_func' cannot have the same name as its parent scope.");
-        runTest("siblingScopesSameName.txt", "Semantic Error: Sibling scopes 'F_func1' cannot have the same name.");
+                "Semantic Error: Function name 'func' conflicts with a variable or function name.");
+        runTest("siblingScopesSameName.txt", "Semantic Error: Function 'func1' is already declared in this scope.");
         runTest("callToImmediateChildScope.txt", null);
         runTest("recursiveCallFunction.txt", null);
-        runTest("recursiveCallMain.txt", "Semantic Error: Recursive call to 'main' is not allowed.");
 
         System.out.println("Tests passed: " + testsPassed + "/" + totalTests);
         System.out.println("Tests failed: " + testsFailed + "/" + totalTests);

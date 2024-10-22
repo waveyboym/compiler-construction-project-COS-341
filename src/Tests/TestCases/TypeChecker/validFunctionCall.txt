@@ -1,0 +1,13 @@
+main
+    begin
+        F_func(1, 2, 3);
+    end
+
+    void F_func(V_a, V_b, V_c) {
+        num V_x, num V_y, num V_z,
+
+        begin
+            print V_a;
+        end
+    }
+    end

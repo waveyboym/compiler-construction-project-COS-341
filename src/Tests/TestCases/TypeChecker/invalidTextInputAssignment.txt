@@ -1,0 +1,6 @@
+main
+    text V_x
+
+    begin
+        V_x < input;
+    end

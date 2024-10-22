@@ -1,0 +1,13 @@
+main
+    begin
+        print F_invalid(2, 3, 4);
+    end
+
+    num F_invalid(V_a, V_b, V_c) {
+        num V_x, num V_y, num V_z,
+
+        begin
+            return "Text";
+        end
+    }
+    end
