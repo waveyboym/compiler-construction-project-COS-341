@@ -1,7 +1,11 @@
 main
     begin
-        if 5 then
-            print "True";
+        if add(1, 2) then
+            begin
+                print "True";
+            end
         else
-            print "False";
+            begin
+                print "False";
+            end
     end

@@ -1,4 +1,7 @@
 main
+    num V_a
+
     begin
-        print sqrt("Text");
+        V_a = sqrt("Text");
+        print V_a;
     end

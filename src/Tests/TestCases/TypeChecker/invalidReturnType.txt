@@ -1,6 +1,9 @@
 main
+    num V_sa
+
     begin
-        print F_invalid(2, 3, 4);
+        V_sa = F_invalid(2, 3, 4);
+        print V_sa;
     end
 
     num F_invalid(V_a, V_b, V_c) {

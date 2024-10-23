@@ -2,58 +2,58 @@
 <PARSETREE>
  <PROG>
    <MAIN>
-    <ID>41d12583-6729-46e2-8f67-f37b5d2d837b</ID>
+    <ID>9d8772b1-53d2-4aed-9b45-56cc90218fa4</ID>
     <VALUE>main</VALUE>
    </MAIN>
    <GLOBVARS>
      <NUM>
-      <ID>f6c556af-47c3-4641-9b73-d80707378e00</ID>
+      <ID>a4ea99f0-a19b-40f1-a077-8204b6a69333</ID>
       <VALUE>num</VALUE>
      </NUM>
      <VNAME>
-      <ID>793d1482-2203-4de2-8e25-b300d3701d1c</ID>
-      <VALUE>V_result</VALUE>
+      <ID>3cb67956-ccf3-414d-8b59-ef04b59b3f44</ID>
+      <VALUE>V_a</VALUE>
      </VNAME>
    </GLOBVARS>
 
    <ALGO>
      <BEGIN>
-      <ID>6bc1f9cd-cc8b-4d54-8545-fc851f4f86b9</ID>
+      <ID>c5545229-e052-4c0d-9170-f88675259cec</ID>
       <VALUE>begin</VALUE>
      </BEGIN>
      <INSTRUC>
        <COMMAND>
          <ASSIGN>
            <VNAME>
-            <ID>297cc667-dba0-48fb-80bf-7a61e8ca3443</ID>
-            <VALUE>V_result</VALUE>
+            <ID>5b0547e8-cdcb-4018-9650-6c35d83f5440</ID>
+            <VALUE>V_a</VALUE>
            </VNAME>
            <EQUAL_SIGN>
-            <ID>62136e2b-cf64-4a29-8b2d-baacf0da5bea</ID>
+            <ID>8ec4d22d-dc52-4931-90ae-8f618f811e27</ID>
             <VALUE>=</VALUE>
            </EQUAL_SIGN>
            <TERM>
              <OP>
                <SQRT>
-                <ID>943a1512-2c98-4a96-91c8-1c1e0174e949</ID>
+                <ID>e095e54b-4fa8-4e60-9535-dcc432ca543f</ID>
                 <VALUE>sqrt</VALUE>
                </SQRT>
                <LEFT_PAREN>
-                <ID>5e29fa83-93c1-41c5-856d-9a70cf89bc8c</ID>
+                <ID>404d7975-82ff-4672-8fef-a7e260ab70ac</ID>
                 <VALUE>(</VALUE>
                </LEFT_PAREN>
                <ARG>
                  <ATOMIC>
-                   <NUMLIT>
-                    <ID>575958ad-9338-43d7-8c98-08134fcec0d1</ID>
-                    <VALUE>16</VALUE>
-                   </NUMLIT>
+                   <TEXTLIT>
+                    <ID>573e4238-6fff-444f-ba59-2dd9c6e6e528</ID>
+                    <VALUE>Text</VALUE>
+                   </TEXTLIT>
                  </ATOMIC>
 
                </ARG>
 
                <RIGHT_PAREN>
-                <ID>a74a1513-3ebd-472c-9cc6-0cb4668d8359</ID>
+                <ID>73bbb1b6-dfcd-4a7e-acfa-367f3a062427</ID>
                 <VALUE>)</VALUE>
                </RIGHT_PAREN>
              </OP>
@@ -65,13 +65,34 @@
        </COMMAND>
 
        <SEMICOLON>
-        <ID>db0ef15a-ed06-40f5-a43f-c7a2ba0dca26</ID>
+        <ID>865323e9-a7e3-48ed-8f44-4b8472fed4fb</ID>
         <VALUE>;</VALUE>
        </SEMICOLON>
+       <INSTRUC>
+         <COMMAND>
+           <PRINT>
+            <ID>27a619de-b11c-48ef-a8d9-4bf604bb2c4a</ID>
+            <VALUE>print</VALUE>
+           </PRINT>
+           <ATOMIC>
+             <VNAME>
+              <ID>68f5342b-83a1-4637-9156-98c77d7fa636</ID>
+              <VALUE>V_a</VALUE>
+             </VNAME>
+           </ATOMIC>
+
+         </COMMAND>
+
+         <SEMICOLON>
+          <ID>ed8a8975-a658-4b32-9fc4-8970a350a0a9</ID>
+          <VALUE>;</VALUE>
+         </SEMICOLON>
+       </INSTRUC>
+
      </INSTRUC>
 
      <END>
-      <ID>f7e58cda-34e9-4224-b1a8-4b07ac254254</ID>
+      <ID>7f4025b8-f265-4205-a587-942618745cf5</ID>
       <VALUE>end</VALUE>
      </END>
    </ALGO>

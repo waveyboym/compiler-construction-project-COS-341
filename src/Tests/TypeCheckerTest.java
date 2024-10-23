@@ -23,19 +23,19 @@ public class TypeCheckerTest {
         System.out.println("Running TypeChecker tests...");
 
         runTest("validNumericAssignment.txt", true, null);
-        runTest("invalidStringToNumericAssignment.txt", false, "Type mismatch in assignment to variable 'V_x'");
+        runTest("invalidStringToNumericAssignment.txt", false, "Type Error: Type mismatch in assignment to variable 'x'");
         runTest("validFunctionReturn.txt", true, null);
-        runTest("invalidReturnType.txt", false, "Return type mismatch: Expected 'n', found 't'");
+        runTest("invalidReturnType.txt", false, "Type Error: Return type mismatch: Expected 'n', found 't'");
         runTest("numericInputAssignment.txt", true, null);
-        runTest("invalidTextInputAssignment.txt", false, "Input can only be assigned to variables of type 'num'");
+        runTest("invalidTextInputAssignment.txt", false, "Type Error: Input can only be assigned to variables of type 'num'");
         runTest("validBinaryOperation.txt", true, null);
-        runTest("mismatchedBinaryOperation.txt", false, "Type mismatch in binary operation");
+        runTest("mismatchedBinaryOperation.txt", false, "Type Error: Type mismatch in binary operation");
         runTest("validConditionalBranch.txt", true, null);
-        runTest("invalidConditionalBranch.txt", false, "Condition in if statement must be boolean");
+        runTest("invalidConditionalBranch.txt", false, "Type Error: Condition in if statement must be boolean");
         runTest("validFunctionCall.txt", true, null);
-        runTest("invalidFunctionCall.txt", false, "Function arguments must be of type 'num'");
+        runTest("invalidFunctionCall.txt", false, "Type Error: Function arguments must be of type 'num'.");
         runTest("validUnaryOperation.txt", true, null);
-        runTest("invalidUnaryOperation.txt", false, "Type mismatch in unary operation");
+        runTest("invalidUnaryOperation.txt", false, "Type Error: Type mismatch in unary operation");
 
         System.out.println("Tests passed: " + testsPassed + "/" + totalTests);
         System.out.println("Tests failed: " + testsFailed + "/" + totalTests);

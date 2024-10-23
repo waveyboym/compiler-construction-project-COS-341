@@ -32,7 +32,7 @@ public class TypeChecker {
         typeMap.put("div", 'n');
         typeMap.put("sqrt", 'n');
         typeMap.put("eq", 'c'); // Comparison operators
-        typeMap.put("grt", 'c');
+        typeMap.put("gt", 'c');
         typeMap.put("and", 'b');
         typeMap.put("or", 'b');
         typeMap.put("not", 'b');
@@ -349,7 +349,7 @@ public class TypeChecker {
             switch (child.symbol) {
                 case NUM:
                 case TEXT:
-                case VOID:
+                case FVOID:
                     ftypNode = child;
                     break;
                 case FNAME:
@@ -710,7 +710,7 @@ public class TypeChecker {
 
         // Find the function return type in the HEADER node
         for (SyntaxTreeNode child : headerNode.children) {
-            if (child.symbol == TokenType.NUM || child.symbol == TokenType.TEXT || child.symbol == TokenType.VOID) {
+            if (child.symbol == TokenType.NUM || child.symbol == TokenType.TEXT || child.symbol == TokenType.FVOID) {
                 ftypNode = child;
                 break;
             }
@@ -783,7 +783,7 @@ public class TypeChecker {
                 return node.type;
             case NUM:
             case TEXT:
-            case VOID:
+            case FVOID:
                 node.type = typeMap.getOrDefault(node.value, 'u');
                 return node.type;
             default:
