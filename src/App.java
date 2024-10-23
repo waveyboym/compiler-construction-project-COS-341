@@ -74,11 +74,6 @@ public class App {
 
             System.out.println("Type checking passed.");
 
-            //CodeGenIM codeGenIM = new CodeGenIM(globalScope, pt);
-            //FileManager.writeIMCode("out/imcode.txt", codeGenIM.generateCode());
-            // bro it doesn't even run lol
-            //System.out.println("Intermediate Code Generation Completed Successfully");
-
             CodeGenBasic cgb = new CodeGenBasic(pt);
             FileManager.writeBasicCode("out/basic.bas", cgb.generateCode());
 
