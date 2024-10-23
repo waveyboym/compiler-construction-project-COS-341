@@ -1,4 +1,5 @@
 package Utils;
+
 import Interfaces.ParseNode;
 import Interfaces.Token;
 import Interfaces.TokenType;

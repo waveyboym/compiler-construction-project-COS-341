@@ -1,5 +1,5 @@
 main
-    num V_x,
+    num V_x
 
     begin
         V_x < input;

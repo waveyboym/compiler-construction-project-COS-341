@@ -1,7 +1,11 @@
 main
     begin
         if grt(5, 3) then
-            print "Greater";
+            begin
+                print "Greater";
+            end
         else
-            print "Smaller";
+            begin
+                print "Smaller";
+            end
     end

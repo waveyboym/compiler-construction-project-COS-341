@@ -29,7 +29,7 @@ public class ParseNode {
 
     public void addChild(ParseNode child) {
         // check if child is null and discard if null
-        if(child == null){
+        if (child == null) {
             return;
         }
         this.children.add(child);
@@ -42,7 +42,7 @@ public class ParseNode {
 
     private String toString(String prefix, boolean isTail) {
         StringBuilder sb = new StringBuilder();
-        if(token != null) {
+        if (token != null) {
             sb.append(prefix).append(isTail ? "└── " : "├── ").append(token.toString()).append("\n");
         } else {
             sb.append(prefix).append(isTail ? "└── " : "├── ").append(this.nonterminalname).append("\n");
@@ -58,20 +58,28 @@ public class ParseNode {
         return sb.toString();
     }
 
-    public String toXML(String prefix){
+    public String toXML(String prefix) {
         StringBuilder xml = new StringBuilder();
-        if(this.type == ParseType.TERMINAL){
+        if (this.type == ParseType.TERMINAL) {
             xml.append(prefix).append("<").append(this.token.type).append(">\n")
-            .append(prefix).append(" <ID>").append(this.token.uuid).append("</ID>\n")
-            .append(prefix).append(" <VALUE>").append(this.token.Value).append("</VALUE>\n")
-            .append(prefix).append("</").append(this.token.type).append(">");
+                    .append(prefix).append(" <ID>").append(this.token.uuid).append("</ID>\n")
+                    .append(prefix).append(" <VALUE>").append(ltCheck(this.token.Value)).append("</VALUE>\n")
+                    .append(prefix).append("</").append(this.token.type).append(">");
         } else {
             xml.append(prefix).append("<").append(this.nonterminalname).append(">\n");
-            for(ParseNode child : this.children){
+            for (ParseNode child : this.children) {
                 xml.append(child.toXML(prefix + "  ")).append("\n");
             }
             xml.append(prefix).append("</").append(this.nonterminalname).append(">\n");
         }
         return xml.toString();
+    }
+
+    private static String ltCheck(String value) {
+        if (value.equals("<")) {
+            return "&lt;";
+        } else {
+            return value;
+        }
     }
 }
