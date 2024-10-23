@@ -29,13 +29,13 @@ public class TypeCheckerTest {
         runTest("numericInputAssignment.txt", true, null);
         runTest("invalidTextInputAssignment.txt", false, "Type Error: Input can only be assigned to variables of type 'num'");
         runTest("validBinaryOperation.txt", true, null);
-        runTest("mismatchedBinaryOperation.txt", false, "Type Error: Type mismatch in binary operation");
+        runTest("mismatchedBinaryOperation.txt", false, "Type Error: Type mismatch in binary operation 'add'");
         runTest("validConditionalBranch.txt", true, null);
         runTest("invalidConditionalBranch.txt", false, "Type Error: Condition in if statement must be boolean");
         runTest("validFunctionCall.txt", true, null);
         runTest("invalidFunctionCall.txt", false, "Type Error: Function arguments must be of type 'num'.");
         runTest("validUnaryOperation.txt", true, null);
-        runTest("invalidUnaryOperation.txt", false, "Type Error: Type mismatch in unary operation");
+        runTest("invalidUnaryOperation.txt", false, "Type Error: Type mismatch in unary operation 'sqrt'");
 
         System.out.println("Tests passed: " + testsPassed + "/" + totalTests);
         System.out.println("Tests failed: " + testsFailed + "/" + totalTests);

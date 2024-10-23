@@ -492,10 +492,68 @@ public class TypeChecker {
             return false;
         }
 
-        SyntaxTreeNode child = node.children.get(0); // Could be UNOPSIMPLE, BINOPSIMPLE, etc.
-        boolean result = typecheck(child);
-        node.type = typeof(child);
-        return result;
+        SyntaxTreeNode operatorNode = node.children.get(0); // Operator node
+        String operator = operatorNode.value.toLowerCase();
+
+        char operatorType = typeMap.getOrDefault(operator, 'u');
+
+        if (operatorType == 'u') {
+            reportError("Unknown operator: " + operator);
+            node.type = 'u';
+            return false;
+        }
+
+        boolean isUnary = operator.equals("not") || operator.equals("sqrt");
+
+        if (isUnary) {
+            // Unary operator
+            SyntaxTreeNode argNode = node.children.get(2); // Argument node
+            boolean argCheck = typecheck(argNode);
+            char argType = typeof(argNode);
+
+            if (!argCheck) {
+                node.type = 'u';
+                return false;
+            }
+
+            if ((operatorType == 'n' && argType == 'n') || (operatorType == 'b' && argType == 'b')) {
+                node.type = operatorType;
+                return true;
+            } else {
+                reportError("Type mismatch in unary operation '" + operator + "'");
+                node.type = 'u';
+                return false;
+            }
+        } else {
+            // Binary operator
+            SyntaxTreeNode arg1Node = node.children.get(2); // First argument
+            SyntaxTreeNode arg2Node = node.children.get(4); // Second argument
+
+            boolean arg1Check = typecheck(arg1Node);
+            boolean arg2Check = typecheck(arg2Node);
+            char arg1Type = typeof(arg1Node);
+            char arg2Type = typeof(arg2Node);
+
+            if (!arg1Check || !arg2Check) {
+                node.type = 'u';
+                return false;
+            }
+
+            if (operatorType == 'n' && arg1Type == 'n' && arg2Type == 'n') {
+                node.type = 'n';
+                return true;
+            } else if (operatorType == 'b' && arg1Type == 'b' && arg2Type == 'b') {
+                node.type = 'b';
+                return true;
+            } else if (operatorType == 'c' && arg1Type == 'n' && arg2Type == 'n') {
+                node.type = 'b'; // Comparison operators return boolean
+                return true;
+            } else {
+                reportError("Type mismatch in binary operation '" + operator + "'");
+                node.type = 'u';
+                return false;
+            }
+        }
     }
 
     /**
