@@ -11,24 +11,23 @@ javac -d bin -sourcepath src src\Interfaces\*.java src\Utils\*.java src\CodeGenB
 rem Check if compilation was successful
 if %errorlevel% == 0 (
     echo Compilation successful
-    rem Ask user for input file
-    set /p input="Enter input file: "
-
-    rem Check if the input file exists
-    if exist "%input%" (
-        rem Copy input file to bin directory
-        copy "%input%" bin
-        rem Go into bin directory
-        cd bin
-        rem Run the program with the input file as an argument
-        java App < "%input%"
-        
-        rem Remove .class files recursively after execution
-        del /s /q *.class
-        cd ..
-    ) else (
-        echo File "%input%" does not exist.
+    rem Copy input file to bin directory
+    copy input\main.spl bin
+    rem Go into bin directory
+    cd bin
+    rem check input file was copied successfuly
+    if not exist main.spl (
+        echo Input file not found
+        exit /b
     )
+    rem Run the program with the input file as an argument
+    java App main.spl
+    rem Remove .class files recursively after execution and delete the input file
+    del /s /q *.class > nul 2>&1
+    del main.spl > nul 2>&1
+    rem Copy the output file in out/basic.bas to root
+    copy out\basic.bas ..
+    cd ..
 ) else (
     echo Compilation failed
 )

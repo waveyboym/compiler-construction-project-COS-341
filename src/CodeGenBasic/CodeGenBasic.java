@@ -82,7 +82,7 @@ public class CodeGenBasic {
             default -> throw new IllegalArgumentException("Unexpected value: " + vtype.token.type);
         }
 
-        if(gbvars.children.size() > 2){
+        if(gbvars.children.size() > 3){
             sb.append(generateBasicGlobalVariables(gbvars.children.get(3), indent));
         }
 

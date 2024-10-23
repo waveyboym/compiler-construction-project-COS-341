@@ -23,10 +23,16 @@ public class FileManager {
     public static void createAndWriteFile(String path, String contents) {
         try {
             File file = new File(path);
-            // create file if it does not exist else overwrite
-            if (file.createNewFile()) {}
-            try (java.io.FileWriter writer = new java.io.FileWriter(path)) {
-                writer.write(contents);
+            // Create directories if they do not exist
+            File parentDir = file.getParentFile();
+            if (parentDir != null && !parentDir.exists()) {
+                parentDir.mkdirs();  // Create parent directories if necessary
+            }
+            // Create the file if it does not exist; overwrite if it does
+            if (file.createNewFile() || file.exists()) {
+                try (java.io.FileWriter writer = new java.io.FileWriter(file)) {
+                    writer.write(contents);
+                }
             }
         } catch (IOException e) {
             System.out.println("An error occurred: " + e.getMessage());

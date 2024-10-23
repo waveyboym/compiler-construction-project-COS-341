@@ -23,7 +23,7 @@ You can run either the <a href="#run-exe-file">pre-compiled binary</a> or the <a
 3. Run the executable in a terminal:
 ```
 // windows
-compiler-windows.exe input/main.spl
+compiler-windows-1.0.exe input/main.spl
 
 //unix
 ./compiler-unix input/main.spl
