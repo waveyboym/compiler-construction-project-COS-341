@@ -6,29 +6,31 @@
   - [Table of contents](#table-of-contents)
   - [How do I run it?](#how-do-i-run-it)
   - [Run precompiled binary](#run-precompiled-binary)
-      - [Run exe file](#run-exe-file)
+      - [Run exe file on windows](#run-exe-file-on-windows)
   - [I am feeling brave and I don't trust you](#i-am-feeling-brave-and-i-dont-trust-you)
     - [Pre-requisites](#pre-requisites)
       - [Run jar file](#run-jar-file)
       - [Run scripts](#run-scripts)
+  - [Additional info](#additional-info)
 
 ## How do I run it?
 You can run either the <a href="#run-exe-file">pre-compiled binary</a> or the <a href="#run-jar-file">jar file</a> or <a href="#run-scripts">compile and run the program yourself</a>
 
 ## Run precompiled binary
 
-#### Run exe file
-1. <a href="https://github.com/waveyboym/compiler-construction-project/releases">Download the executable</a> or navigate to <a href="build">build</a> folder and copy that executable from there. Take the one that aligns with your OS, eg ```compiler-windows.exe``` is for windows whilst ```compiler-unix``` is for unix based operating systems
-2. Ensure you have you ```spl``` or input ```txt``` file ready
-3. Run the executable in a terminal:
+#### Run exe file on windows
+1. Navigate to <a href="build">build</a> and unzip the ```compiler-windows.zip``` file
+2. Run:
 ```
-// windows
-compiler-windows-1.0.exe input/main.spl
-
-//unix
-./compiler-unix input/main.spl
+cd compiler-windows
 ```
-4. Use this website to execute the basic code <a href="https://www.jdoodle.com/execute-yabasic-online">basic compiler</a>
+3. Copy the file you want to compile into that folder
+4. Run the executable in a terminal:
+```
+compiler-windows.exe main.spl
+```
+5. Give it a bit of some time after execution has completed and you will see and ```out``` folder appear which you canexpand to see the ```basic.bas``` file.
+6. Use this website to execute the basic code <a href="https://www.jdoodle.com/execute-yabasic-online">basic compiler</a>
 > [!NOTE]  
 > We made use of YABASIC and as such our syntax follows YABASIC dialect
 
@@ -42,10 +44,10 @@ compiler-windows-1.0.exe input/main.spl
 > You cannot proceed past this point if you don't have java installed
 
 #### Run jar file
-1. Copy the jar file from the <a href="build">build</a> folder
+1. Go to the jar file in the <a href="build">build</a> folder
 2. Open up a terminal and run:
 ```
-java -jar compiler-1.0-SNAPSHOT.jar input/main.spl
+java -jar compiler-1.0-SNAPSHOT.jar main.spl
 ```
 3. Use this website to execute the basic code <a href="https://www.jdoodle.com/execute-yabasic-online">basic compiler</a>
 > [!NOTE]  
@@ -60,7 +62,8 @@ otherwise if you are on linux, run:
 ```
 ./run.sh
 ```
-2. Use this website to execute the basic code <a href="https://www.jdoodle.com/execute-yabasic-online">basic compiler</a>
+2. Go into the <a href="bin/out">bin</a> folder and find the <a href="bin/out/basic.bas">basic.bas</a> file there
+3. Use this website to execute the basic code <a href="https://www.jdoodle.com/execute-yabasic-online">basic compiler</a>
 > [!NOTE]  
 > We made use of YABASIC and as such our syntax follows YABASIC dialect
 > 
@@ -69,3 +72,10 @@ otherwise if you are on linux, run:
 
 > [!WARNING]  
 > It is always good practice to read and make sure you understand what the bat/bash file will do on your system before just running it.
+
+## Additional info
+
+1. Create bin executable with jpackage
+```
+jpackage --input target/ --name compiler-windows --main-jar compiler-1.0-SNAPSHOT.jar  --type app-image
+```

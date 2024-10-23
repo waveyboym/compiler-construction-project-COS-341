@@ -2,10 +2,15 @@ import java.util.List;
 
 import CodeGenBasic.CodeGenBasic;
 import Interfaces.ParseNode;
+import Interfaces.SyntaxTreeNode;
 import Interfaces.Token;
 import Lexer.Lexer;
 import Parser.Parser;
+import ScopeAnalyzer.ScopeAnalyzer;
+import TypeChecker.TypeChecker;
 import Utils.FileManager;
+import Utils.Scope;
+import Utils.SyntaxTreeParser;
 import Utils.XMLGenerator;
 
 public class App {
@@ -40,7 +45,7 @@ public class App {
 
             System.out.println("Parsing Completed Successfully");
 
-            /*SyntaxTreeParser stp = new SyntaxTreeParser();
+            SyntaxTreeParser stp = new SyntaxTreeParser();
             SyntaxTreeNode st = stp.parse("out/parser.xml");
 
             if (st == null) {
@@ -67,7 +72,7 @@ public class App {
                 throw new Exception(msg);
             }
 
-            System.out.println("Type checking passed.");*/
+            System.out.println("Type checking passed.");
 
             //CodeGenIM codeGenIM = new CodeGenIM(globalScope, pt);
             //FileManager.writeIMCode("out/imcode.txt", codeGenIM.generateCode());
