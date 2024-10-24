@@ -7,6 +7,7 @@
   - [How do I run it?](#how-do-i-run-it)
   - [Run precompiled binary](#run-precompiled-binary)
       - [Run exe file on windows](#run-exe-file-on-windows)
+      - [Run exe file on unix](#run-exe-file-on-unix)
   - [I am feeling brave and I don't trust you](#i-am-feeling-brave-and-i-dont-trust-you)
     - [Pre-requisites](#pre-requisites)
       - [Run jar file](#run-jar-file)
@@ -24,12 +25,32 @@ You can run either the <a href="#run-exe-file">pre-compiled binary</a> or the <a
 ```
 cd compiler-windows
 ```
-3. Copy the file you want to compile into that folder
+3. Copy the file you want to compile into that folder or make use of the spl file already there
 4. Run the executable in a terminal:
 ```
+// if you use command prompt
 compiler-windows.exe main.spl
+
+// if you use powershell
+./compiler-windows.exe main.spl
 ```
-5. Give it a bit of some time after execution has completed and you will see and ```out``` folder appear which you canexpand to see the ```basic.bas``` file.
+5. Give it a bit of some time after execution has completed and you will see and ```out``` folder appear which you can expand to see the ```basic.bas``` file.
+6. Use this website to execute the basic code <a href="https://www.jdoodle.com/execute-yabasic-online">basic compiler</a>
+> [!NOTE]  
+> We made use of YABASIC and as such our syntax follows YABASIC dialect
+
+#### Run exe file on unix
+1. Navigate to <a href="build">build</a> and unzip the ```compiler-unix.zip``` file
+2. Run:
+```
+cd compiler-unix/bin
+```
+3. Copy the file you want to compile into that folder or make use of the spl file already there
+4. Run the executable in a terminal:
+```
+compiler-unix main.spl
+```
+5. Give it a bit of some time after execution has completed and you will see and ```out``` folder appear which you can expand to see the ```basic.bas``` file.
 6. Use this website to execute the basic code <a href="https://www.jdoodle.com/execute-yabasic-online">basic compiler</a>
 > [!NOTE]  
 > We made use of YABASIC and as such our syntax follows YABASIC dialect
@@ -75,7 +96,11 @@ otherwise if you are on linux, run:
 
 ## Additional info
 
-1. Create bin executable with jpackage
+1. Create bin executable with jpackage for windows
 ```
 jpackage --input target/ --name compiler-windows --main-jar compiler-1.0-SNAPSHOT.jar  --type app-image
+```
+2. Create bin executable with jpackage for unix
+```
+jpackage --input target/ --name compiler-unix --main-jar compiler-1.0-SNAPSHOT.jar  --type app-image
 ```
