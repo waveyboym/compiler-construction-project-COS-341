@@ -1,0 +1,35 @@
+main
+num V_num1, num V_num2,
+begin
+  V_num1 < input;
+  V_num2 = add(V_num1, 3);
+  print V_num2;
+  if grt(V_num2, 10) then 
+    begin
+        halt;
+    end
+   else 
+    begin
+        F_process(V_num1, V_num2, V_num2);
+    end;
+end
+
+num F_process(V_a, V_b, V_c)
+{
+  num V_res1, num V_res2, num V_res3,
+  begin
+    V_res1 = mul(V_a, V_b);
+    V_res2 = sub(V_res1, 5);
+    V_res3 = div(V_res2, V_b);
+    print V_res3;
+    if eq(V_res3, 0) then 
+        begin
+            halt;
+        end
+    else 
+        begin
+            F_process(V_res3, V_b, V_c);
+        end;
+  end
+}
+end

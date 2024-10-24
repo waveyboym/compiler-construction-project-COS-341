@@ -1,0 +1,33 @@
+main
+num V_count, text V_message,
+begin
+  V_count < input;
+  V_message = "Welcome";
+  print V_message;
+  if eq(V_count, 0) then 
+    begin
+        halt; 
+    end
+  else 
+    begin
+        F_increment(V_count, V_count, V_count);
+    end;
+end
+
+num F_increment(V_x, V_y, V_z)
+{
+  num V_result, num V_temp, num V_dummy,
+  begin
+    V_result = add(V_x, 1);
+    print V_result;
+    if grt(V_result, 5) then
+        begin
+            halt;
+        end
+    else 
+        begin
+            F_increment(V_result, V_result, V_result);
+        end;
+  end
+}
+end

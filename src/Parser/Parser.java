@@ -1,10 +1,11 @@
 package Parser;
+import java.util.List;
+
 import Interfaces.ParseNode;
 import Interfaces.ParseType;
 import Interfaces.Token;
 import Interfaces.TokenType;
 import Utils.Errors;
-import java.util.List;
 
 public class Parser {
     private final List<Token> tokens;
@@ -320,12 +321,11 @@ public class Parser {
         // command
         node.addChild(parseCommand());
 
-        // if ";" then parse Instruc else return node
-        if (this.current.type == TokenType.SEMICOLON) {
-            node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
-            this.advance();
-            node.addChild(parseInstruc());
-        }
+        // semi-colon
+        matchType(TokenType.SEMICOLON);
+        node.addChild(new ParseNode(this.current, ParseType.TERMINAL));
+        this.advance();
+        node.addChild(parseInstruc());
 
         return node;
     }
